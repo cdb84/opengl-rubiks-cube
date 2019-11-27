@@ -57,7 +57,7 @@ void arrays_init(void)
 	for(int i = 0; i < num_vertices; i++){
 		vertices[i] = matrix_multiply_vector(translation, vertices[i]);
 		// vertices[i] = matrix_multiply_vector(test_frustum, vertices[i]);
-		vector_print(vertices[i]);
+		// vector_print(vertices[i]);
 	}
 }
 
@@ -66,7 +66,7 @@ void init(void)
 	// hermanault: near -.2, far -300, right .5, left-.5, top  .5, bottom  -.5
 	model_view_ctm = projection_ctm = identity();
 	// initialize shader programs
-	GLuint program = initShader("vshader_lighting.glsl", "fshader_lighting.glsl");
+	GLuint program = initShader("vshader_rubik.glsl", "fshader_rubik.glsl");
 	glUseProgram(program);
 
 	// vertex array object initialization and binds it for buffering and rendering
