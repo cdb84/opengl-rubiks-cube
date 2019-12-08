@@ -48,17 +48,24 @@ vec4 at_vector = {0.0, 0.0, 0.0, 1.0};
 vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
 float eye_degree = 0.0;
 
-mat4 front_ctm;
-int front_range[9]= {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
+mat4 ctm_back;
+mat4 ctm_front;
+int range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
+int range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
+
+void back()
+{
+	ctm_back = matrix_multiply(rotation_z_matrix(90 * (M_PI/180)), ctm_back);
+}
 
 void front()
 {
-	front_ctm = matrix_multiply(rotation_z_matrix(90 * (M_PI/180)), front_ctm);
+	ctm_front = matrix_multiply(rotation_z_matrix(-90 * (M_PI/180)), ctm_front);
 }
 
 void arrays_init(void)
 {
-	front_ctm = identity();
+	ctm_back = ctm_front = identity();
 	origin_matrix = translate(-CUBE_SIZE/2, -CUBE_SIZE/2, -CUBE_SIZE/2);
 	fill_colors(colors, VERTICES_SIZE);
 	for(int i = 0; i < 27; i++){
@@ -205,14 +212,17 @@ void display(void)
 	// draw the in-pipeline array of vertices, specific to the start and end index specified in 
 	// the second and third argument
 	// right now we will only draw the front, with it's respective CTM
-	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&front_ctm);
+	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_back);
 	for(int i = 0; i < 9; i++){
-		printf("(%d)\n", front_range[i]);
-		glDrawArrays(GL_TRIANGLES, front_range[i], CUBE_VERTICES);
+		glDrawArrays(GL_TRIANGLES, range_back[i], CUBE_VERTICES);
+	}
+
+	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_front);
+	for(int i = 0; i < 9; i++){
+		glDrawArrays(GL_TRIANGLES, range_front[i], CUBE_VERTICES);
 	}
 
 	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
-
 	glutSwapBuffers();
 }
 
@@ -221,12 +231,16 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	printf("key: %i\n", key);
 	if (key == 'q')
 		exit(0);
+	if (key == 'p')
+		eye_degree = 0.05;
+	if (key == '[')
+		eye_degree = 0.00;
 
 	if (key == 'f') front();
 	if (key == 'r');
 	if (key == 'u');
 	if (key == 'l');
-	if (key == 'b');
+	if (key == 'b') back();
 	if (key == 'd');
 	//glutPostRedisplay();
 }
