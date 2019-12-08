@@ -28,6 +28,7 @@
 #define CUBE_SIZE 0.15
 #define CUBE_VERTICES 36
 #define VERTICES_SIZE CUBE_VERTICES*27
+#define ROTATION_BOUND 90 * (M_PI/180)
 
 vec4 colors[VERTICES_SIZE] ;
 
@@ -41,31 +42,44 @@ GLuint ctm_location;
 mat4 model_view_ctm;
 mat4 projection_ctm;
 
+mat4 rotation_matrix;
+
 mat4 origin_matrix;
 
 vec4 eye_position = {0.0, 0.0, -0.25, 1.0};
 vec4 at_vector = {0.0, 0.0, 0.0, 1.0};
 vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
-float eye_degree = 0.0;
+float eye_degree = 0.05;
 
 mat4 ctm_back;
 mat4 ctm_front;
+mat4 ctm_up;
 int range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
 int range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
+int range_up[9] = {CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8, CUBE_VERTICES*15, CUBE_VERTICES*16, CUBE_VERTICES*17, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
 
 void back()
 {
+	rotation_matrix = identity();
 	ctm_back = matrix_multiply(rotation_z_matrix(90 * (M_PI/180)), ctm_back);
+	
 }
 
 void front()
 {
+	rotation_matrix = identity();
 	ctm_front = matrix_multiply(rotation_z_matrix(-90 * (M_PI/180)), ctm_front);
+}
+
+void up()
+{
+	rotation_matrix = identity();
+	ctm_up = matrix_multiply(rotation_y_matrix(ROTATION_BOUND), ctm_up);
 }
 
 void arrays_init(void)
 {
-	ctm_back = ctm_front = identity();
+	ctm_back = ctm_front = ctm_up = rotation_matrix = identity();
 	origin_matrix = translate(-CUBE_SIZE/2, -CUBE_SIZE/2, -CUBE_SIZE/2);
 	fill_colors(colors, VERTICES_SIZE);
 	for(int i = 0; i < 27; i++){
@@ -173,8 +187,6 @@ void init(void)
 
 	// stores the location of one particular uniform variable in from the program
 	// for use later in displaying and controlling the uniform variable
-	model_view_ctm_location = glGetUniformLocation(program, "model_view");
-	projection_ctm_location = glGetUniformLocation(program, "projection"); 
 	ctm_location = glGetUniformLocation(program, "ctm");
 
 	// enable hidden surface removal
@@ -206,8 +218,6 @@ void display(void)
 	// 3: transpose? (no)
 	// 4: pointer to the matrix in application
 	// the CTM "ctm" will essentially take on the uniform variable "ctm" in the vShader
-	glUniformMatrix4fv(model_view_ctm_location, 1, GL_FALSE, (GLfloat *)&model_view_ctm);
-	glUniformMatrix4fv(projection_ctm_location, 1, GL_FALSE, (GLfloat *)&projection_ctm);
 	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 	// draw the in-pipeline array of vertices, specific to the start and end index specified in 
 	// the second and third argument
@@ -222,6 +232,11 @@ void display(void)
 		glDrawArrays(GL_TRIANGLES, range_front[i], CUBE_VERTICES);
 	}
 
+	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_up);
+	for(int i = 0; i < 9; i++){
+		glDrawArrays(GL_TRIANGLES, range_up[i], CUBE_VERTICES);
+	}
+
 	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 	glutSwapBuffers();
 }
@@ -232,23 +247,26 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	if (key == 'q')
 		exit(0);
 	if (key == 'p')
-		eye_degree = 0.05;
+		rotation_matrix = matrix_multiply(rotation_y_matrix(eye_degree), rotation_matrix);
+		matrix_print(rotation_matrix);
 	if (key == '[')
-		eye_degree = 0.00;
+		rotation_matrix = identity();
 
 	if (key == 'f') front();
 	if (key == 'r');
-	if (key == 'u');
+	if (key == 'u') up();
 	if (key == 'l');
 	if (key == 'b') back();
 	if (key == 'd');
+	if (key == 's');
 	//glutPostRedisplay();
 }
 void idle(void)
 {
-	eye_position = matrix_multiply_vector(rotation_y_matrix(eye_degree), eye_position);
-	model_view_ctm = look_at_vector(eye_position, at_vector, up_vector);
-
+	ctm_back = matrix_multiply(ctm_back, rotation_matrix);
+	ctm_front = matrix_multiply(ctm_front, rotation_matrix);
+	ctm_up = matrix_multiply(ctm_up, rotation_matrix);
+	
 	glutPostRedisplay();
 }
 
