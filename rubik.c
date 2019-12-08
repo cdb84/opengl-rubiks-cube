@@ -29,6 +29,7 @@
 #define CUBE_VERTICES 36
 #define VERTICES_SIZE CUBE_VERTICES*27
 #define ROTATION_BOUND 90 * (M_PI/180)
+#define GAP 0.01
 
 vec4 colors[VERTICES_SIZE] ;
 
@@ -51,12 +52,13 @@ vec4 at_vector = {0.0, 0.0, 0.0, 1.0};
 vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
 float eye_degree = 0.05;
 
-mat4 ctm_back;
-mat4 ctm_front;
-mat4 ctm_up;
+mat4 ctm_back, ctm_front, ctm_up, ctm_down, ctm_right, ctm_left;
 int range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
 int range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
 int range_up[9] = {CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8, CUBE_VERTICES*15, CUBE_VERTICES*16, CUBE_VERTICES*17, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
+int range_down[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*9, CUBE_VERTICES*10, CUBE_VERTICES*11, CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20};
+int range_right[9] = {CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20, CUBE_VERTICES*21, CUBE_VERTICES*22, CUBE_VERTICES*23, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
+int range_left[9] = {};
 
 void back()
 {
@@ -77,59 +79,77 @@ void up()
 	ctm_up = matrix_multiply(rotation_y_matrix(ROTATION_BOUND), ctm_up);
 }
 
+void down()
+{
+	rotation_matrix = identity();
+	ctm_down = matrix_multiply(rotation_y_matrix(ROTATION_BOUND), ctm_down);
+}
+
+void right()
+{
+	rotation_matrix = identity();
+	ctm_right = matrix_multiply(rotation_x_matrix(ROTATION_BOUND), ctm_right);
+}
+
+void left()
+{
+	rotation_matrix = identity();
+	ctm_left = matrix_multiply(rotation_x_matrix(ROTATION_BOUND), ctm_left);
+}
+
 void arrays_init(void)
 {
-	ctm_back = ctm_front = ctm_up = rotation_matrix = identity();
-	origin_matrix = translate(-CUBE_SIZE/2, -CUBE_SIZE/2, -CUBE_SIZE/2);
+	ctm_back = ctm_front = ctm_up = ctm_down = ctm_right = rotation_matrix = identity();
+	origin_matrix = translate(-(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2);
 	fill_colors(colors, VERTICES_SIZE);
 	for(int i = 0; i < 27; i++){
-		generate_cube(vertices, VERTICES_SIZE, CUBE_SIZE-0.01, i*36);
+		generate_cube(vertices, VERTICES_SIZE, CUBE_SIZE-GAP, i*36);
 		uniform_transform(vertices, origin_matrix, i*36, i*36+36);
 	}
 	// bottom left row: 0 - CUBE_VERTICES * 3
-	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, -CUBE_SIZE), 0, CUBE_VERTICES);
-	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, 0.0), CUBE_VERTICES, CUBE_VERTICES*2);
-	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*2, CUBE_VERTICES*3);
+	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, -CUBE_SIZE), 0, CUBE_VERTICES); // b & d
+	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, 0.0), CUBE_VERTICES, CUBE_VERTICES*2); // d
+	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*2, CUBE_VERTICES*3); // f & d
 
 	// middle left row: CUBE_VERTICES*3 - CUBE_VERTICES*6
-	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, -CUBE_SIZE), CUBE_VERTICES*3, CUBE_VERTICES*4);
-	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, 0.0), CUBE_VERTICES*4, CUBE_VERTICES*5);
-	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, CUBE_SIZE), CUBE_VERTICES*5, CUBE_VERTICES*6);
+	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, -CUBE_SIZE), CUBE_VERTICES*3, CUBE_VERTICES*4); // b & l
+	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, 0.0), CUBE_VERTICES*4, CUBE_VERTICES*5); // l
+	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, CUBE_SIZE), CUBE_VERTICES*5, CUBE_VERTICES*6); // f & l
 
 	// top left row: CUBE_VERTICES*6 - CUBE_VERTICES*9
-	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*6, CUBE_VERTICES*7);
-	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, 0.0), CUBE_VERTICES*7, CUBE_VERTICES*8);
-	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*8, CUBE_VERTICES*9);
+	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*6, CUBE_VERTICES*7); // b & u
+	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, 0.0), CUBE_VERTICES*7, CUBE_VERTICES*8); // u & l
+	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*8, CUBE_VERTICES*9); // f & u
 
 	// bottom middle row: CUBE_VERTICES*9 - CUBE_VERTICES*12
-	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*9, CUBE_VERTICES*10);
-	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, 0.0), CUBE_VERTICES*10, CUBE_VERTICES*11);
-	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*11, CUBE_VERTICES*12);
+	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*9, CUBE_VERTICES*10); // d & b
+	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, 0.0), CUBE_VERTICES*10, CUBE_VERTICES*11); // d
+	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*11, CUBE_VERTICES*12); // f && d
 
 	// middle middle row: CUBE_VERTICES*12 - CUBE_VERTICES*15
 	uniform_transform(vertices, translate(0.0, 0.0, -CUBE_SIZE), CUBE_VERTICES*12, CUBE_VERTICES*13);
 	uniform_transform(vertices, translate(0.0, 0.0, 0.0), CUBE_VERTICES*13, CUBE_VERTICES*14);
-	uniform_transform(vertices, translate(0.0, 0.0, CUBE_SIZE), CUBE_VERTICES*14, CUBE_VERTICES*15);
+	uniform_transform(vertices, translate(0.0, 0.0, CUBE_SIZE), CUBE_VERTICES*14, CUBE_VERTICES*15); // f
 
 	// top middle row: CUBE_VERTICES*15 - CUBE_VERTICES*18
 	uniform_transform(vertices, translate(0.0, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*15, CUBE_VERTICES*16);
 	uniform_transform(vertices, translate(0.0, CUBE_SIZE, 0.0), CUBE_VERTICES*16, CUBE_VERTICES*17);
-	uniform_transform(vertices, translate(0.0, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*17, CUBE_VERTICES*18);
+	uniform_transform(vertices, translate(0.0, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*17, CUBE_VERTICES*18); // f
 
 	// bottom right row: CUBE_VERTICES*18 - CUBE_VERTICES*21
 	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*18, CUBE_VERTICES*19);
 	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, 0.0), CUBE_VERTICES*19, CUBE_VERTICES*20);
-	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*20, CUBE_VERTICES*21);
+	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*20, CUBE_VERTICES*21); // f
 
 	// middle right row: CUBE_VERTICES*21 - CUBE_VERTICES*24
 	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, -CUBE_SIZE), CUBE_VERTICES*21, CUBE_VERTICES*22);
 	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, 0.0), CUBE_VERTICES*22, CUBE_VERTICES*23);
-	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, CUBE_SIZE), CUBE_VERTICES*23, CUBE_VERTICES*24);
+	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, CUBE_SIZE), CUBE_VERTICES*23, CUBE_VERTICES*24); // f
 
 	// top right row: CUBE_VERTICES*24 - CUBE_VERTICES*27
 	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*24, CUBE_VERTICES*25);
 	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, 0.0), CUBE_VERTICES*25, CUBE_VERTICES*26);
-	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*26, CUBE_VERTICES*27);
+	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*26, CUBE_VERTICES*27); // f
 
 }
 
@@ -237,6 +257,16 @@ void display(void)
 		glDrawArrays(GL_TRIANGLES, range_up[i], CUBE_VERTICES);
 	}
 
+	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_down);
+	for(int i = 0; i < 9; i++){
+		glDrawArrays(GL_TRIANGLES, range_down[i], CUBE_VERTICES);
+	}
+
+	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_right);
+	for(int i = 0; i < 9; i++){
+		glDrawArrays(GL_TRIANGLES, range_right[i], CUBE_VERTICES);
+	}
+
 	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 	glutSwapBuffers();
 }
@@ -253,11 +283,11 @@ void keyboard(unsigned char key, int mousex, int mousey)
 		rotation_matrix = identity();
 
 	if (key == 'f') front();
-	if (key == 'r');
+	if (key == 'r') right();
 	if (key == 'u') up();
 	if (key == 'l');
 	if (key == 'b') back();
-	if (key == 'd');
+	if (key == 'd') down();
 	if (key == 's');
 	//glutPostRedisplay();
 }
@@ -266,6 +296,8 @@ void idle(void)
 	ctm_back = matrix_multiply(ctm_back, rotation_matrix);
 	ctm_front = matrix_multiply(ctm_front, rotation_matrix);
 	ctm_up = matrix_multiply(ctm_up, rotation_matrix);
+	ctm_down = matrix_multiply(ctm_down, rotation_matrix);
+	ctm_right = matrix_multiply(ctm_right, rotation_matrix);
 	
 	glutPostRedisplay();
 }
