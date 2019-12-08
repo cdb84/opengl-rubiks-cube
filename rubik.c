@@ -58,7 +58,7 @@ int range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VE
 int range_up[9] = {CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8, CUBE_VERTICES*15, CUBE_VERTICES*16, CUBE_VERTICES*17, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
 int range_down[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*9, CUBE_VERTICES*10, CUBE_VERTICES*11, CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20};
 int range_right[9] = {CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20, CUBE_VERTICES*21, CUBE_VERTICES*22, CUBE_VERTICES*23, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
-int range_left[9] = {};
+int range_left[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*3, CUBE_VERTICES*4, CUBE_VERTICES*5, CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8};
 
 void back()
 {
@@ -99,7 +99,7 @@ void left()
 
 void arrays_init(void)
 {
-	ctm_back = ctm_front = ctm_up = ctm_down = ctm_right = rotation_matrix = identity();
+	ctm_back = ctm_front = ctm_up = ctm_down = ctm_right = ctm_left = rotation_matrix = identity();
 	origin_matrix = translate(-(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2);
 	fill_colors(colors, VERTICES_SIZE);
 	for(int i = 0; i < 27; i++){
@@ -267,6 +267,11 @@ void display(void)
 		glDrawArrays(GL_TRIANGLES, range_right[i], CUBE_VERTICES);
 	}
 
+	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_left);
+	for(int i = 0; i < 9; i++){
+		glDrawArrays(GL_TRIANGLES, range_left[i], CUBE_VERTICES);
+	}
+
 	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 	glutSwapBuffers();
 }
@@ -285,7 +290,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	if (key == 'f') front();
 	if (key == 'r') right();
 	if (key == 'u') up();
-	if (key == 'l');
+	if (key == 'l') left();
 	if (key == 'b') back();
 	if (key == 'd') down();
 	if (key == 's');
@@ -298,6 +303,7 @@ void idle(void)
 	ctm_up = matrix_multiply(ctm_up, rotation_matrix);
 	ctm_down = matrix_multiply(ctm_down, rotation_matrix);
 	ctm_right = matrix_multiply(ctm_right, rotation_matrix);
+	ctm_left = matrix_multiply(ctm_left, rotation_matrix);
 	
 	glutPostRedisplay();
 }
