@@ -25,16 +25,11 @@
 #include <math.h>
 
 #define BUFFER_OFFSET(offset) ((GLvoid *)(offset))
-#define CUBE_SIZE 0.5
-#define VERTICES_SIZE 36
+#define CUBE_SIZE 0.15
+#define CUBE_VERTICES 36
+#define VERTICES_SIZE CUBE_VERTICES*27
 
-const vec4 colors[VERTICES_SIZE] =
-		{GREEN, GREEN, GREEN, GREEN, GREEN, GREEN,
-		 BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,
-		 RED, RED, RED, RED, RED, RED,
-		 PINK, PINK, PINK, PINK, PINK, PINK,
-		 PURP, PURP, PURP, PURP, PURP, PURP,
-		 YELL, YELL, YELL, YELL, YELL, YELL};
+vec4 colors[VERTICES_SIZE] ;
 
 vec4 vertices[VERTICES_SIZE];
 int num_vertices = VERTICES_SIZE;
@@ -45,26 +40,74 @@ GLuint projection_ctm_location;
 mat4 model_view_ctm;
 mat4 projection_ctm;
 
-vec4 eye_position = {0.0, 0.75, -0.75, 1.0};
-float eye_degree = 0.005;
+mat4 origin_matrix;
+mat4 transformation_mats[27];
+
+vec4 eye_position = {0.0, 0.0, -0.25, 1.0};
+vec4 at_vector = {0.0, 0.0, 0.0, 1.0};
+vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
+float eye_degree = 0.05;
 
 void arrays_init(void)
 {
-	mat4 test_frustum = frustum(-0.5, 0.5, -0.5, 0.5, -0.2, 6000.0);
-	mat4 translation = identity();
-	generate_cube(vertices, num_vertices, 0.75);
-
-	for(int i = 0; i < num_vertices; i++){
-		vertices[i] = matrix_multiply_vector(translation, vertices[i]);
-		// vertices[i] = matrix_multiply_vector(test_frustum, vertices[i]);
-		// vector_print(vertices[i]);
+	origin_matrix = translate(-CUBE_SIZE/2, -CUBE_SIZE/2, -CUBE_SIZE/2);
+	fill_colors(colors, VERTICES_SIZE);
+	for(int i = 0; i < 27; i++){
+		generate_cube(vertices, VERTICES_SIZE, CUBE_SIZE-0.01, i*36);
+		uniform_transform(vertices, origin_matrix, i*36, i*36+36);
 	}
+	// bottom left row
+	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, -CUBE_SIZE), 0, CUBE_VERTICES);
+	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, 0.0), CUBE_VERTICES, CUBE_VERTICES*2);
+	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*2, CUBE_VERTICES*3);
+
+	// middle left row
+	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, -CUBE_SIZE), CUBE_VERTICES*3, CUBE_VERTICES*4);
+	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, 0.0), CUBE_VERTICES*4, CUBE_VERTICES*5);
+	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, CUBE_SIZE), CUBE_VERTICES*5, CUBE_VERTICES*6);
+
+	// top left row
+	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*6, CUBE_VERTICES*7);
+	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, 0.0), CUBE_VERTICES*7, CUBE_VERTICES*8);
+	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*8, CUBE_VERTICES*9);
+
+	// bottom middle row
+	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*9, CUBE_VERTICES*10);
+	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, 0.0), CUBE_VERTICES*10, CUBE_VERTICES*11);
+	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*11, CUBE_VERTICES*12);
+
+	// middle middle row
+	uniform_transform(vertices, translate(0.0, 0.0, -CUBE_SIZE), CUBE_VERTICES*12, CUBE_VERTICES*13);
+	uniform_transform(vertices, translate(0.0, 0.0, 0.0), CUBE_VERTICES*13, CUBE_VERTICES*14);
+	uniform_transform(vertices, translate(0.0, 0.0, CUBE_SIZE), CUBE_VERTICES*14, CUBE_VERTICES*15);
+
+	// top middle row
+	uniform_transform(vertices, translate(0.0, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*15, CUBE_VERTICES*16);
+	uniform_transform(vertices, translate(0.0, CUBE_SIZE, 0.0), CUBE_VERTICES*16, CUBE_VERTICES*17);
+	uniform_transform(vertices, translate(0.0, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*17, CUBE_VERTICES*18);
+
+	// bottom right row
+	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*18, CUBE_VERTICES*19);
+	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, 0.0), CUBE_VERTICES*19, CUBE_VERTICES*20);
+	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*20, CUBE_VERTICES*21);
+
+	// middle right row
+	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, -CUBE_SIZE), CUBE_VERTICES*21, CUBE_VERTICES*22);
+	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, 0.0), CUBE_VERTICES*22, CUBE_VERTICES*23);
+	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, CUBE_SIZE), CUBE_VERTICES*23, CUBE_VERTICES*24);
+
+	// top right row
+	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*24, CUBE_VERTICES*25);
+	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, 0.0), CUBE_VERTICES*25, CUBE_VERTICES*26);
+	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*26, CUBE_VERTICES*27);
+
 }
 
 void init(void)
 {
 	// hermanault: near -.2, far -300, right .5, left-.5, top  .5, bottom  -.5
-	model_view_ctm = projection_ctm = identity();
+	projection_ctm = identity();
+	model_view_ctm = look_at_vector(eye_position, at_vector, up_vector);
 	// initialize shader programs
 	GLuint program = initShader("vshader_rubik.glsl", "fshader_rubik.glsl");
 	glUseProgram(program);
@@ -166,6 +209,9 @@ void keyboard(unsigned char key, int mousex, int mousey)
 }
 void idle(void)
 {
+	eye_position = matrix_multiply_vector(rotation_y_matrix(eye_degree), eye_position);
+	model_view_ctm = look_at_vector(eye_position, at_vector, up_vector);
+
 	glutPostRedisplay();
 }
 
