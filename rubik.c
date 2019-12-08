@@ -36,67 +36,76 @@ int num_vertices = VERTICES_SIZE;
 
 GLuint model_view_ctm_location;
 GLuint projection_ctm_location;
+GLuint ctm_location;
 
 mat4 model_view_ctm;
 mat4 projection_ctm;
 
 mat4 origin_matrix;
-mat4 transformation_mats[27];
 
 vec4 eye_position = {0.0, 0.0, -0.25, 1.0};
 vec4 at_vector = {0.0, 0.0, 0.0, 1.0};
 vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
-float eye_degree = 0.05;
+float eye_degree = 0.0;
+
+mat4 front_ctm;
+int front_range[9]= {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
+
+void front()
+{
+	front_ctm = matrix_multiply(rotation_z_matrix(90 * (M_PI/180)), front_ctm);
+}
 
 void arrays_init(void)
 {
+	front_ctm = identity();
 	origin_matrix = translate(-CUBE_SIZE/2, -CUBE_SIZE/2, -CUBE_SIZE/2);
 	fill_colors(colors, VERTICES_SIZE);
 	for(int i = 0; i < 27; i++){
 		generate_cube(vertices, VERTICES_SIZE, CUBE_SIZE-0.01, i*36);
 		uniform_transform(vertices, origin_matrix, i*36, i*36+36);
 	}
-	// bottom left row
+	// bottom left row: 0 - CUBE_VERTICES * 3
 	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, -CUBE_SIZE), 0, CUBE_VERTICES);
 	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, 0.0), CUBE_VERTICES, CUBE_VERTICES*2);
 	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*2, CUBE_VERTICES*3);
 
-	// middle left row
+	// middle left row: CUBE_VERTICES*3 - CUBE_VERTICES*6
 	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, -CUBE_SIZE), CUBE_VERTICES*3, CUBE_VERTICES*4);
 	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, 0.0), CUBE_VERTICES*4, CUBE_VERTICES*5);
 	uniform_transform(vertices, translate(-CUBE_SIZE, 0.0, CUBE_SIZE), CUBE_VERTICES*5, CUBE_VERTICES*6);
 
-	// top left row
+	// top left row: CUBE_VERTICES*6 - CUBE_VERTICES*9
 	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*6, CUBE_VERTICES*7);
 	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, 0.0), CUBE_VERTICES*7, CUBE_VERTICES*8);
 	uniform_transform(vertices, translate(-CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*8, CUBE_VERTICES*9);
 
-	// bottom middle row
+	// bottom middle row: CUBE_VERTICES*9 - CUBE_VERTICES*12
 	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*9, CUBE_VERTICES*10);
 	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, 0.0), CUBE_VERTICES*10, CUBE_VERTICES*11);
 	uniform_transform(vertices, translate(0.0, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*11, CUBE_VERTICES*12);
 
-	// middle middle row
+	// middle middle row: CUBE_VERTICES*12 - CUBE_VERTICES*15
 	uniform_transform(vertices, translate(0.0, 0.0, -CUBE_SIZE), CUBE_VERTICES*12, CUBE_VERTICES*13);
 	uniform_transform(vertices, translate(0.0, 0.0, 0.0), CUBE_VERTICES*13, CUBE_VERTICES*14);
 	uniform_transform(vertices, translate(0.0, 0.0, CUBE_SIZE), CUBE_VERTICES*14, CUBE_VERTICES*15);
 
-	// top middle row
+	// top middle row: CUBE_VERTICES*15 - CUBE_VERTICES*18
 	uniform_transform(vertices, translate(0.0, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*15, CUBE_VERTICES*16);
 	uniform_transform(vertices, translate(0.0, CUBE_SIZE, 0.0), CUBE_VERTICES*16, CUBE_VERTICES*17);
 	uniform_transform(vertices, translate(0.0, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*17, CUBE_VERTICES*18);
 
-	// bottom right row
+	// bottom right row: CUBE_VERTICES*18 - CUBE_VERTICES*21
 	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*18, CUBE_VERTICES*19);
 	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, 0.0), CUBE_VERTICES*19, CUBE_VERTICES*20);
 	uniform_transform(vertices, translate(CUBE_SIZE, -CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*20, CUBE_VERTICES*21);
 
-	// middle right row
+	// middle right row: CUBE_VERTICES*21 - CUBE_VERTICES*24
 	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, -CUBE_SIZE), CUBE_VERTICES*21, CUBE_VERTICES*22);
 	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, 0.0), CUBE_VERTICES*22, CUBE_VERTICES*23);
 	uniform_transform(vertices, translate(CUBE_SIZE, 0.0, CUBE_SIZE), CUBE_VERTICES*23, CUBE_VERTICES*24);
 
-	// top right row
+	// top right row: CUBE_VERTICES*24 - CUBE_VERTICES*27
 	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, -CUBE_SIZE), CUBE_VERTICES*24, CUBE_VERTICES*25);
 	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, 0.0), CUBE_VERTICES*25, CUBE_VERTICES*26);
 	uniform_transform(vertices, translate(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), CUBE_VERTICES*26, CUBE_VERTICES*27);
@@ -105,7 +114,6 @@ void arrays_init(void)
 
 void init(void)
 {
-	// hermanault: near -.2, far -300, right .5, left-.5, top  .5, bottom  -.5
 	projection_ctm = identity();
 	model_view_ctm = look_at_vector(eye_position, at_vector, up_vector);
 	// initialize shader programs
@@ -160,6 +168,7 @@ void init(void)
 	// for use later in displaying and controlling the uniform variable
 	model_view_ctm_location = glGetUniformLocation(program, "model_view");
 	projection_ctm_location = glGetUniformLocation(program, "projection"); 
+	ctm_location = glGetUniformLocation(program, "ctm");
 
 	// enable hidden surface removal
 	glEnable(GL_DEPTH_TEST);
@@ -192,9 +201,17 @@ void display(void)
 	// the CTM "ctm" will essentially take on the uniform variable "ctm" in the vShader
 	glUniformMatrix4fv(model_view_ctm_location, 1, GL_FALSE, (GLfloat *)&model_view_ctm);
 	glUniformMatrix4fv(projection_ctm_location, 1, GL_FALSE, (GLfloat *)&projection_ctm);
+	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 	// draw the in-pipeline array of vertices, specific to the start and end index specified in 
 	// the second and third argument
-	glDrawArrays(GL_TRIANGLES, 0, num_vertices);
+	// right now we will only draw the front, with it's respective CTM
+	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&front_ctm);
+	for(int i = 0; i < 9; i++){
+		printf("(%d)\n", front_range[i]);
+		glDrawArrays(GL_TRIANGLES, front_range[i], CUBE_VERTICES);
+	}
+
+	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 
 	glutSwapBuffers();
 }
@@ -205,6 +222,12 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	if (key == 'q')
 		exit(0);
 
+	if (key == 'f') front();
+	if (key == 'r');
+	if (key == 'u');
+	if (key == 'l');
+	if (key == 'b');
+	if (key == 'd');
 	//glutPostRedisplay();
 }
 void idle(void)

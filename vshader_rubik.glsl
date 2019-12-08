@@ -14,4 +14,5 @@ void main()
 	color = vColor;
 	gl_Position = projection * model_view * vPosition / vPosition.w;
 	gl_Position.w = 1.0;
+	gl_Position = gl_Position * ctm;
 }
