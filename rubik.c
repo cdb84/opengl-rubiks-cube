@@ -399,8 +399,8 @@ void left()
 
 void shuffle()
 {
-	CALL_COUNT = 1;
-	ROTATION_BOUND = 90 * (M_PI/180);
+	// CALL_COUNT = 1;
+	// ROTATION_BOUND = 90 * (M_PI/180);
 
 	srand(time(NULL));
 	char s[SCRAMBLE_DEPTH];
@@ -441,8 +441,8 @@ void shuffle()
 		delay(1);
 	}
 	puts("Done scrambling!");
-	CALL_COUNT = TCALL_COUNT;
-	ROTATION_BOUND = TROTATION_BOUND;
+	// CALL_COUNT = TCALL_COUNT;
+	// ROTATION_BOUND = TROTATION_BOUND;
 }
 
 void solve()
