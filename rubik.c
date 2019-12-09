@@ -105,7 +105,8 @@ void back()
 void front()
 {
 	rotation_matrix = identity();
-	mat4 rotation = rotation_z_matrix(-ROTATION_BOUND);
+	mat4 rotation = rotation_z_matrix(ROTATION_BOUND);
+
 	cubies[8] = matrix_multiply(rotation, cubies[8]);
 	cubies[17] = matrix_multiply(rotation, cubies[17]);
 	cubies[26] = matrix_multiply(rotation, cubies[26]);
@@ -118,35 +119,83 @@ void front()
 	cubies[11] = matrix_multiply(rotation, cubies[11]);
 	cubies[20] = matrix_multiply(rotation, cubies[20]);
 
-	// ctm_front = matrix_multiply(rotation_z_matrix(-90 * (M_PI/180)), ctm_front);
 	r_string_front();
 }
 
 void up()
 {
 	rotation_matrix = identity();
-	ctm_up = matrix_multiply(rotation_y_matrix(ROTATION_BOUND), ctm_up);
+	mat4 rotation = rotation_y_matrix(ROTATION_BOUND);
+
+	cubies[6] = matrix_multiply(rotation, cubies[6]);
+	cubies[15] = matrix_multiply(rotation, cubies[15]);
+	cubies[24] = matrix_multiply(rotation, cubies[24]);
+
+	cubies[9] = matrix_multiply(rotation, cubies[9]);
+	cubies[16] = matrix_multiply(rotation, cubies[16]);
+	cubies[25] = matrix_multiply(rotation, cubies[25]);
+
+	cubies[8] = matrix_multiply(rotation, cubies[8]);
+	cubies[17] = matrix_multiply(rotation, cubies[17]);
+	cubies[26] = matrix_multiply(rotation, cubies[26]);
+
 	r_string_up();
 }
 
 void down()
 {
 	rotation_matrix = identity();
-	ctm_down = matrix_multiply(rotation_y_matrix(ROTATION_BOUND), ctm_down);
+	mat4 rotation = rotation_y_matrix(-ROTATION_BOUND);
+
+	cubies[2] = matrix_multiply(rotation, cubies[2]);
+	cubies[11] = matrix_multiply(rotation, cubies[11]);
+	cubies[20] = matrix_multiply(rotation, cubies[20]);
+
+	cubies[1] = matrix_multiply(rotation, cubies[1]);
+	cubies[10] = matrix_multiply(rotation, cubies[10]);
+	cubies[19] = matrix_multiply(rotation, cubies[19]);
+
+	cubies[0] = matrix_multiply(rotation, cubies[0]);
+	cubies[9] = matrix_multiply(rotation, cubies[9]);
+	cubies[18] = matrix_multiply(rotation, cubies[18]);
 	r_string_down();
 }
 
 void right()
 {
 	rotation_matrix = identity();
-	ctm_right = matrix_multiply(rotation_x_matrix(ROTATION_BOUND), ctm_right);
+	mat4 rotation = rotation_x_matrix(ROTATION_BOUND);
+
+	cubies[26] = matrix_multiply(rotation, cubies[26]);
+	cubies[25] = matrix_multiply(rotation, cubies[25]);
+	cubies[24] = matrix_multiply(rotation, cubies[24]);
+
+	cubies[23] = matrix_multiply(rotation, cubies[23]);
+	cubies[22] = matrix_multiply(rotation, cubies[22]);
+	cubies[21] = matrix_multiply(rotation, cubies[21]);
+
+	cubies[20] = matrix_multiply(rotation, cubies[20]);
+	cubies[19] = matrix_multiply(rotation, cubies[19]);
+	cubies[18] = matrix_multiply(rotation, cubies[18]);
 	r_string_right();
 }
 
 void left()
 {
 	rotation_matrix = identity();
-	ctm_left = matrix_multiply(rotation_x_matrix(ROTATION_BOUND), ctm_left);
+	mat4 rotation = rotation_x_matrix(-ROTATION_BOUND);
+
+	cubies[6] = matrix_multiply(rotation, cubies[6]);
+	cubies[7] = matrix_multiply(rotation, cubies[7]);
+	cubies[8] = matrix_multiply(rotation, cubies[8]);
+
+	cubies[3] = matrix_multiply(rotation, cubies[3]);
+	cubies[4] = matrix_multiply(rotation, cubies[4]);
+	cubies[5] = matrix_multiply(rotation, cubies[5]);
+
+	cubies[0] = matrix_multiply(rotation, cubies[0]);
+	cubies[1] = matrix_multiply(rotation, cubies[1]);
+	cubies[2] = matrix_multiply(rotation, cubies[2]);
 	r_string_left();
 }
 
