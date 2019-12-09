@@ -31,7 +31,8 @@
 #define BUFFER_OFFSET(offset) ((GLvoid *)(offset))
 #define CUBE_SIZE 0.15
 #define CUBE_VERTICES 36
-#define VERTICES_SIZE CUBE_VERTICES*27
+#define CUBIES 27
+#define VERTICES_SIZE CUBE_VERTICES*CUBIES
 #define ROTATION_BOUND 90 * (M_PI/180)
 #define GAP 0.01
 #define SCRAMBLE_DEPTH 40
@@ -62,6 +63,10 @@ vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
 float eye_degree = 0.05;
 
 mat4 ctm_back, ctm_front, ctm_up, ctm_down, ctm_right, ctm_left;
+
+mat4 cubies[CUBIES];
+
+
 int range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
 int range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
 int range_up[9] = {CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8, CUBE_VERTICES*15, CUBE_VERTICES*16, CUBE_VERTICES*17, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
@@ -215,6 +220,10 @@ void solve()
 
 void arrays_init(void)
 {
+	for(int i = 0; i < CUBIES; i++)
+	{
+		cubies[i] = identity();
+	}
 	ctm_back = ctm_front = ctm_up = ctm_down = ctm_right = ctm_left = rotation_matrix = identity();
 	origin_matrix = translate(-(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2);
 	fill_colors(colors, VERTICES_SIZE);
@@ -342,57 +351,12 @@ void display(void)
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glPolygonMode(GL_BACK, GL_LINE);
 
-	// for multiple VAOs, use:
-	// glBindVertexArray(vao[x]);
-	// glDrawArrays(GL_TRIANGLES, start, end);
-	// glBindVertexArray(vao[y]);
-	// glDrawArrays(GL_TRIANGLES, start, end);
-
-	// send a transformation matrix prior to rendering (will apply to all vertices proceeding)
-	// 1: the location of the transformation matrix from the glGetUniformLocation() fn
-	// 2: the number of matrices (1)
-	// 3: transpose? (no)
-	// 4: pointer to the matrix in application
-	// the CTM "ctm" will essentially take on the uniform variable "ctm" in the vShader
-	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
-	// draw the in-pipeline array of vertices, specific to the start and end index specified in 
-	// the second and third argument
+	for(int i = 0; i < CUBIES; i++)
+	{
+		glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&cubies[i]);
+		glDrawArrays(GL_TRIANGLES, i*36, CUBE_VERTICES);
+	}
 	// right now we will only draw the front, with it's respective CTM
-	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_back);
-	for(int i = 0; i < 9; i++){
-		if(range_back[i] == -1) continue;
-		glDrawArrays(GL_TRIANGLES, range_back[i], CUBE_VERTICES);
-	}
-
-	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_front);
-	for(int i = 0; i < 9; i++){
-		if(range_front[i] == -1) continue;
-		glDrawArrays(GL_TRIANGLES, range_front[i], CUBE_VERTICES);
-	}
-
-	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_up);
-	for(int i = 0; i < 9; i++){
-		if(range_up[i] == -1) continue;
-		glDrawArrays(GL_TRIANGLES, range_up[i], CUBE_VERTICES);
-	}
-
-	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_down);
-	for(int i = 0; i < 9; i++){
-		if(range_down[i] == -1) continue;
-		glDrawArrays(GL_TRIANGLES, range_down[i], CUBE_VERTICES);
-	}
-
-	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_right);
-	for(int i = 0; i < 9; i++){
-		if(range_right[i] == -1) continue;
-		glDrawArrays(GL_TRIANGLES, range_right[i], CUBE_VERTICES);
-	}
-
-	glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&ctm_left);
-	for(int i = 0; i < 9; i++){
-		if(range_left[i] == -1) continue;
-		glDrawArrays(GL_TRIANGLES, range_left[i], CUBE_VERTICES);
-	}
 	glutSwapBuffers();
 }
 
@@ -414,6 +378,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	if (key == 'd' || key == 'D') down();
 	if (key == 's') shuffle();
 	if (key == 'S') solve();
+	puts(r_string);
 }
 void idle(void)
 {
@@ -429,6 +394,7 @@ void idle(void)
 
 int main(int argc, char **argv)
 {
+	puts(r_string);
 	arrays_init();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
