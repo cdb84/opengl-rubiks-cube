@@ -84,7 +84,20 @@ void delay(int number_of_seconds)
 void back()
 {
 	rotation_matrix = identity();
-	ctm_back = matrix_multiply(rotation_z_matrix(90 * (M_PI/180)), ctm_back);
+	mat4 rotation = rotation_z_matrix(-ROTATION_BOUND);
+
+	cubies[24] = matrix_multiply(rotation, cubies[24]);
+	cubies[15] = matrix_multiply(rotation, cubies[15]);
+	cubies[6] = matrix_multiply(rotation, cubies[6]);
+
+	cubies[21] = matrix_multiply(rotation, cubies[21]);
+	cubies[12] = matrix_multiply(rotation, cubies[12]);
+	cubies[3] = matrix_multiply(rotation, cubies[3]);
+
+	cubies[18] = matrix_multiply(rotation, cubies[18]);
+	cubies[9] = matrix_multiply(rotation, cubies[9]);
+	cubies[0] = matrix_multiply(rotation, cubies[0]);
+
 	r_string_back();
 	
 }
@@ -399,12 +412,6 @@ void idle(void)
 	{
 		cubies[i] = matrix_multiply(cubies[i], rotation_matrix);
 	}
-	// ctm_back = matrix_multiply(ctm_back, rotation_matrix);
-	// ctm_front = matrix_multiply(ctm_front, rotation_matrix);
-	// ctm_up = matrix_multiply(ctm_up, rotation_matrix);
-	// ctm_down = matrix_multiply(ctm_down, rotation_matrix);
-	// ctm_right = matrix_multiply(ctm_right, rotation_matrix);
-	// ctm_left = matrix_multiply(ctm_left, rotation_matrix);
 	
 	glutPostRedisplay();
 }
