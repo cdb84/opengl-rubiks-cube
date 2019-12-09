@@ -33,7 +33,7 @@
 #define CUBE_VERTICES 36
 #define CUBIES 27
 #define VERTICES_SIZE CUBE_VERTICES*CUBIES
-#define ROTATION_BOUND 90 * (M_PI/180)
+#define ROTATION_BOUND 1 * (M_PI/180)
 #define GAP 0.01
 #define SCRAMBLE_DEPTH 40
 
@@ -41,13 +41,15 @@
 void keyboard(unsigned char, int, int);
 
 
-vec4 colors[VERTICES_SIZE] ;
-
+vec4 colors[VERTICES_SIZE];
 vec4 vertices[VERTICES_SIZE];
 int num_vertices = VERTICES_SIZE;
 GLuint ctm_location;
 mat4 rotation_matrix;
 mat4 origin_matrix;
+
+int calls = 0;
+void (* ctm_update_fn)();
 
 float eye_degree = 0.005;
 
@@ -60,12 +62,13 @@ void delay(int number_of_seconds)
 	while (clock() < start_time + milli_seconds) 0; 
 } 
 
-void back()
-{
-	puts("Back");
-	rotation_matrix = identity();
-	mat4 rotation = rotation_z_matrix(-ROTATION_BOUND);
+void nothing()
+{}
 
+void back_animation()
+{
+	calls ++;
+	mat4 rotation = rotation_z_matrix(-ROTATION_BOUND);
 	cubies[24] = matrix_multiply(rotation, cubies[24]);
 	cubies[15] = matrix_multiply(rotation, cubies[15]);
 	cubies[6] = matrix_multiply(rotation, cubies[6]);
@@ -77,6 +80,18 @@ void back()
 	cubies[18] = matrix_multiply(rotation, cubies[18]);
 	cubies[9] = matrix_multiply(rotation, cubies[9]);
 	cubies[0] = matrix_multiply(rotation, cubies[0]);
+	if(calls >= 90) 
+	{
+		ctm_update_fn = nothing;
+		calls = 0;
+	}
+}
+
+void back()
+{
+	puts("Back");
+	rotation_matrix = identity();
+	ctm_update_fn = back_animation;
 
 	mat4 s = cubies[18];
 	cubies[18] = cubies[24];
@@ -94,10 +109,8 @@ void back()
 	
 }
 
-void front()
+void front_animation()
 {
-	puts("Front");
-	rotation_matrix = identity();
 	mat4 rotation = rotation_z_matrix(ROTATION_BOUND);
 
 	cubies[8] = matrix_multiply(rotation, cubies[8]);
@@ -111,6 +124,13 @@ void front()
 	cubies[2] = matrix_multiply(rotation, cubies[2]);
 	cubies[11] = matrix_multiply(rotation, cubies[11]);
 	cubies[20] = matrix_multiply(rotation, cubies[20]);
+}
+
+void front()
+{
+	puts("Front");
+	rotation_matrix = identity();
+	ctm_update_fn = front_animation;
 
 	mat4 s = cubies[8];
 	cubies[8] = cubies[26];
@@ -127,10 +147,8 @@ void front()
 	r_string_front();
 }
 
-void up()
+void up_animation()
 {
-	puts("Up");
-	rotation_matrix = identity();
 	mat4 rotation = rotation_y_matrix(ROTATION_BOUND);
 
 	cubies[6] = matrix_multiply(rotation, cubies[6]);
@@ -144,6 +162,13 @@ void up()
 	cubies[8] = matrix_multiply(rotation, cubies[8]);
 	cubies[17] = matrix_multiply(rotation, cubies[17]);
 	cubies[26] = matrix_multiply(rotation, cubies[26]);
+}
+
+void up()
+{
+	puts("Up");
+	rotation_matrix = identity();
+	ctm_update_fn = up_animation;
 
 	mat4 s = cubies[6];
 	cubies[6] = cubies[24];
@@ -159,11 +184,8 @@ void up()
 
 	r_string_up();
 }
-
-void down()
+void down_animation()
 {
-	puts("Down");
-	rotation_matrix = identity();
 	mat4 rotation = rotation_y_matrix(-ROTATION_BOUND);
 
 	cubies[2] = matrix_multiply(rotation, cubies[2]);
@@ -177,6 +199,13 @@ void down()
 	cubies[0] = matrix_multiply(rotation, cubies[0]);
 	cubies[9] = matrix_multiply(rotation, cubies[9]);
 	cubies[18] = matrix_multiply(rotation, cubies[18]);
+}
+
+void down()
+{
+	puts("Down");
+	rotation_matrix = identity();
+	ctm_update_fn = down_animation;
 
 	mat4 s = cubies[2];
 	cubies[2] = cubies[20];
@@ -192,11 +221,8 @@ void down()
 
 	r_string_down();
 }
-
-void right()
+void right_animation()
 {
-	puts("Right");
-	rotation_matrix = identity();
 	mat4 rotation = rotation_x_matrix(ROTATION_BOUND);
 
 	cubies[26] = matrix_multiply(rotation, cubies[26]);
@@ -210,6 +236,13 @@ void right()
 	cubies[20] = matrix_multiply(rotation, cubies[20]);
 	cubies[19] = matrix_multiply(rotation, cubies[19]);
 	cubies[18] = matrix_multiply(rotation, cubies[18]);
+}
+
+void right()
+{
+	puts("Right");
+	rotation_matrix = identity();
+	ctm_update_fn = right_animation;
 
 	mat4 s = cubies[26];
 	cubies[26] = cubies[24];
@@ -225,11 +258,8 @@ void right()
 
 	r_string_right();
 }
-
-void left()
+void left_animation()
 {
-	puts("Left");
-	rotation_matrix = identity();
 	mat4 rotation = rotation_x_matrix(-ROTATION_BOUND);
 
 	cubies[6] = matrix_multiply(rotation, cubies[6]);
@@ -243,6 +273,13 @@ void left()
 	cubies[0] = matrix_multiply(rotation, cubies[0]);
 	cubies[1] = matrix_multiply(rotation, cubies[1]);
 	cubies[2] = matrix_multiply(rotation, cubies[2]);
+}
+
+void left()
+{
+	puts("Left");
+	rotation_matrix = identity();
+	ctm_update_fn = left_animation;
 
 	mat4 s = cubies[6];
 	cubies[6] = cubies[8];
@@ -355,6 +392,7 @@ void solve()
 
 void arrays_init(void)
 {
+	ctm_update_fn = nothing;
 	for(int i = 0; i < CUBIES; i++)
 	{
 		cubies[i] = identity();
@@ -474,7 +512,6 @@ void init(void)
 	// set depth range from 1.0 to 0.0
 	glDepthRange(1, 0);
 }
-
 void display(void)
 {
 	// clear color buffer and depth buffer
@@ -489,6 +526,7 @@ void display(void)
 		glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&cubies[i]);
 		glDrawArrays(GL_TRIANGLES, i*36, CUBE_VERTICES);
 	}
+	ctm_update_fn();
 	// right now we will only draw the front, with it's respective CTM
 	glutSwapBuffers();
 }
