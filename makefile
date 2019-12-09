@@ -16,7 +16,7 @@ lighting: lighting.c initShader.o
 	gcc -o lighting lighting.c initShader.o $(LIBS)
 
 rubik: rubik.c initShader.o
-	gcc -o rubik rubik.c initShader.o $(LIBS)
+	gcc -g -o rubik rubik.c initShader.o $(LIBS)
 
 initShader.o: initShader.c initShader.h
 	gcc -c initShader.c

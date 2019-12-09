@@ -45,44 +45,24 @@ vec4 colors[VERTICES_SIZE] ;
 
 vec4 vertices[VERTICES_SIZE];
 int num_vertices = VERTICES_SIZE;
-
-GLuint model_view_ctm_location;
-GLuint projection_ctm_location;
 GLuint ctm_location;
-
-mat4 model_view_ctm;
-mat4 projection_ctm;
-
 mat4 rotation_matrix;
-
 mat4 origin_matrix;
 
-vec4 eye_position = {0.0, 0.0, -0.25, 1.0};
-vec4 at_vector = {0.0, 0.0, 0.0, 1.0};
-vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
 float eye_degree = 0.005;
-
-mat4 ctm_back, ctm_front, ctm_up, ctm_down, ctm_right, ctm_left;
 
 mat4 cubies[CUBIES];
 
-
-int range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
-int range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
-int range_up[9] = {CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8, CUBE_VERTICES*15, CUBE_VERTICES*16, CUBE_VERTICES*17, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
-int range_down[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*9, CUBE_VERTICES*10, CUBE_VERTICES*11, CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20};
-int range_right[9] = {CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20, CUBE_VERTICES*21, CUBE_VERTICES*22, CUBE_VERTICES*23, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
-int range_left[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*3, CUBE_VERTICES*4, CUBE_VERTICES*5, CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8};
-
 void delay(int number_of_seconds) 
 { 
-    int milli_seconds = 1000 * number_of_seconds; 
-    clock_t start_time = clock(); 
-    while (clock() < start_time + milli_seconds) 0; 
+	int milli_seconds = 1000 * number_of_seconds; 
+	clock_t start_time = clock(); 
+	while (clock() < start_time + milli_seconds) 0; 
 } 
 
 void back()
 {
+	puts("Back");
 	rotation_matrix = identity();
 	mat4 rotation = rotation_z_matrix(-ROTATION_BOUND);
 
@@ -116,6 +96,7 @@ void back()
 
 void front()
 {
+	puts("Front");
 	rotation_matrix = identity();
 	mat4 rotation = rotation_z_matrix(ROTATION_BOUND);
 
@@ -148,6 +129,7 @@ void front()
 
 void up()
 {
+	puts("Up");
 	rotation_matrix = identity();
 	mat4 rotation = rotation_y_matrix(ROTATION_BOUND);
 
@@ -180,6 +162,7 @@ void up()
 
 void down()
 {
+	puts("Down");
 	rotation_matrix = identity();
 	mat4 rotation = rotation_y_matrix(-ROTATION_BOUND);
 
@@ -212,6 +195,7 @@ void down()
 
 void right()
 {
+	puts("Right");
 	rotation_matrix = identity();
 	mat4 rotation = rotation_x_matrix(ROTATION_BOUND);
 
@@ -244,6 +228,7 @@ void right()
 
 void left()
 {
+	puts("Left");
 	rotation_matrix = identity();
 	mat4 rotation = rotation_x_matrix(-ROTATION_BOUND);
 
@@ -333,7 +318,7 @@ void solve()
 		pivot = sol[index];
 		times = (int)(sol[index + 1] - '0');
 
-		printf("%c%d ", pivot, times);
+		// printf("%c%d ", pivot, times);
 
 		switch(pivot){
 			case 'U':
@@ -374,7 +359,7 @@ void arrays_init(void)
 	{
 		cubies[i] = identity();
 	}
-	ctm_back = ctm_front = ctm_up = ctm_down = ctm_right = ctm_left = rotation_matrix = identity();
+	rotation_matrix = identity();
 	origin_matrix = translate(-(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2);
 	fill_colors(colors, VERTICES_SIZE);
 	for(int i = 0; i < 27; i++){
@@ -430,8 +415,6 @@ void arrays_init(void)
 
 void init(void)
 {
-	projection_ctm = identity();
-	model_view_ctm = look_at_vector(eye_position, at_vector, up_vector);
 	// initialize shader programs
 	GLuint program = initShader("vshader_rubik.glsl", "fshader_rubik.glsl");
 	glUseProgram(program);
@@ -518,7 +501,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	if (key == 'p')
 		rotation_matrix = matrix_multiply(rotation_y_matrix(eye_degree), rotation_matrix);
 	if (key == 'P')
-		rotation_matrix = matrix_multiply(rotation_x_matrix(eye_degree), rotation_matrix);
+		rotation_matrix = matrix_multiply(rotation_x_matrix(-eye_degree), rotation_matrix);
 	if (key == '[')
 		rotation_matrix = identity();
 
@@ -530,7 +513,6 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	if (key == 'd' || key == 'D') down();
 	if (key == 's') shuffle();
 	if (key == 'S') solve();
-	puts(r_string);
 }
 void idle(void)
 {
@@ -544,7 +526,6 @@ void idle(void)
 
 int main(int argc, char **argv)
 {
-	puts(r_string);
 	arrays_init();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
