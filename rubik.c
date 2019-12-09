@@ -34,6 +34,11 @@
 #define VERTICES_SIZE CUBE_VERTICES*27
 #define ROTATION_BOUND 90 * (M_PI/180)
 #define GAP 0.01
+#define SCRAMBLE_DEPTH 40
+
+
+void keyboard(unsigned char, int, int);
+
 
 vec4 colors[VERTICES_SIZE] ;
 
@@ -64,6 +69,12 @@ int range_down[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*9, CUBE_VE
 int range_right[9] = {CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20, CUBE_VERTICES*21, CUBE_VERTICES*22, CUBE_VERTICES*23, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
 int range_left[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*3, CUBE_VERTICES*4, CUBE_VERTICES*5, CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8};
 
+void delay(int number_of_seconds) 
+{ 
+    int milli_seconds = 1000 * number_of_seconds; 
+    clock_t start_time = clock(); 
+    while (clock() < start_time + milli_seconds) 0; 
+} 
 
 void back()
 {
@@ -107,20 +118,7 @@ void left()
 	ctm_left = matrix_multiply(rotation_x_matrix(ROTATION_BOUND), ctm_left);
 	r_string_left();
 }
-void delay(int number_of_seconds) 
-{ 
-    // Converting time into milli_seconds 
-    int milli_seconds = 1000 * number_of_seconds; 
-  
-    // Stroing start time 
-    clock_t start_time = clock(); 
-  
-    // looping till required time is not acheived 
-    while (clock() < start_time + milli_seconds) 
-        ; 
-} 
-void keyboard(unsigned char, int, int);
-#define SCRAMBLE_DEPTH 40
+
 void shuffle()
 {
 	srand(time(NULL));
@@ -166,25 +164,57 @@ void shuffle()
 
 void solve()
 {
+	puts("Solving");
+	
+	char* sol = solve_rc();
+	puts(sol);
+	void (*fn)();
+	int times, index = 0;
+	char pivot;
 
+	int strl = strlen(sol);
+	for(int i = 0; i < strl; i+=2)
+	{
+		pivot = sol[index];
+		times = (int)(sol[index + 1] - '0');
+
+		printf("%c%d ", pivot, times);
+
+		switch(pivot){
+			case 'U':
+				fn = up;
+				break;
+			case 'D':
+				fn = down;
+				break;
+			case 'L':
+				fn = left;
+				break;
+			case 'R':
+				fn = right;
+				break;
+			case 'F':
+				fn = front;
+				break;
+			case 'B':
+				fn = back;
+				break;
+			default:
+				fn = up;
+		}
+
+		for(int x = 0; x < times; x++)
+		{
+			fn();
+		}
+
+		index += 2;
+	}
+	puts("Done solving");
 }
 
 void arrays_init(void)
 {
-	// int t_range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
-	// int t_range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
-	// int t_range_up[9] = {t_range_back[2], CUBE_VERTICES*7, t_range_front[2], t_range_back[5], CUBE_VERTICES*16, t_range_front[5], t_range_back[8], CUBE_VERTICES*25, t_range_front[8]};
-	// int t_range_down[9] = {t_range_back[0], CUBE_VERTICES, t_range_front[0], t_range_back[3], CUBE_VERTICES*10, t_range_front[3], t_range_back[6], CUBE_VERTICES*19, t_range_front[6]};
-	// int t_range_right[9] = {t_range_down[6], t_range_down[7], t_range_front[6], t_range_back[7], CUBE_VERTICES*22, t_range_front[7], t_range_up[6], t_range_up[7], t_range_up[8]};
-	// int t_range_left[9] = {t_range_down[0], t_range_down[1], t_range_down[2], t_range_back[1], CUBE_VERTICES*4, t_range_front[1], t_range_up[0], t_range_up[1], t_range_front[2]};
-
-	// memcpy(range_back, t_range_back, sizeof(t_range_back));
-	// memcpy(range_front, t_range_front, sizeof(t_range_front));
-	// memcpy(range_up, t_range_up, sizeof(t_range_up));
-	// memcpy(range_down, t_range_down, sizeof(t_range_down));
-	// memcpy(range_right, t_range_right, sizeof(t_range_right));
-	// memcpy(range_left, t_range_left, sizeof(t_range_left));
-
 	ctm_back = ctm_front = ctm_up = ctm_down = ctm_right = ctm_left = rotation_matrix = identity();
 	origin_matrix = translate(-(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2);
 	fill_colors(colors, VERTICES_SIZE);
@@ -363,8 +393,6 @@ void display(void)
 		if(range_left[i] == -1) continue;
 		glDrawArrays(GL_TRIANGLES, range_left[i], CUBE_VERTICES);
 	}
-
-	// glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 	glutSwapBuffers();
 }
 
@@ -385,7 +413,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	if (key == 'b' || key == 'B') back();
 	if (key == 'd' || key == 'D') down();
 	if (key == 's') shuffle();
-	if (key == 13) solve();
+	if (key == 'S') solve();
 }
 void idle(void)
 {
