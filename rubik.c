@@ -1,8 +1,8 @@
 /*
  * triangle.c
  *
- *  Created on: Aug 28, 2017
- *      Author: Thumrongsak Kosiyatrakul
+ *  Created on: 9 DEC 2019
+ *      Author: Connor Berry
  */
 
 #ifdef __APPLE__ // include Mac OS X verions of headers
@@ -30,7 +30,7 @@
 
 #define BUFFER_OFFSET(offset) ((GLvoid *)(offset))
 #define CUBE_SIZE 0.15
-#define CUBE_VERTICES 36
+#define CUBE_VERTICES 72
 #define CUBIES 27
 #define VERTICES_SIZE CUBE_VERTICES*CUBIES
 #define DEGREE_DELTA 2
@@ -41,6 +41,7 @@
 
 
 void keyboard(unsigned char, int, int);
+void display(void);
 
 
 vec4 colors[VERTICES_SIZE];
@@ -428,9 +429,9 @@ void arrays_init(void)
 	rotation_matrix = identity();
 	origin_matrix = translate(-(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2);
 	fill_colors(colors, VERTICES_SIZE);
-	for(int i = 0; i < 27; i++){
-		generate_cube(vertices, VERTICES_SIZE, CUBE_SIZE-GAP, i*36);
-		uniform_transform(vertices, origin_matrix, i*36, i*36+36);
+	for(int i = 0; i < CUBIES; i++){
+		generate_cube(vertices, VERTICES_SIZE, CUBE_SIZE-GAP, i*CUBE_VERTICES);
+		uniform_transform(vertices, origin_matrix, i*CUBE_VERTICES, i*CUBE_VERTICES+CUBE_VERTICES);
 	}
 	// bottom left row: 0 - CUBE_VERTICES * 3
 	uniform_transform(vertices, translate(-CUBE_SIZE, -CUBE_SIZE, -CUBE_SIZE), 0, CUBE_VERTICES); // b & d
@@ -551,7 +552,7 @@ void display(void)
 	for(int i = 0; i < CUBIES; i++)
 	{
 		glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&cubies[i]);
-		glDrawArrays(GL_TRIANGLES, i*36, CUBE_VERTICES);
+		glDrawArrays(GL_TRIANGLES, i*CUBE_VERTICES, CUBE_VERTICES);
 	}
 	
 	// right now we will only draw the front, with it's respective CTM
