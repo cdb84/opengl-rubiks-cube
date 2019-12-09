@@ -63,7 +63,7 @@ float eye_degree = 0.005;
 
 mat4 cubies[CUBIES];
 
-int i_up[9] = {6, 15, 24, 7, 6, 25, 8, 17, 26};
+int i_up[9] = {6, 15, 24, 7, 16, 25, 8, 17, 26};
 int i_down[9] = {2, 11, 20, 1, 10, 19, 0, 9, 18};
 int i_right[9] = {26, 25, 24, 23, 22, 21, 20, 19, 18};
 int i_left[9] = {6, 7, 8, 3, 4, 5, 0, 1, 2};
@@ -122,18 +122,12 @@ void front_animation()
 {
 	mat4 rotation = rotation_z_matrix(ROTATION_BOUND);
 
-	for(int i = 0; i < CALL_COUNT; i++){
-		cubies[8] = matrix_multiply(rotation, cubies[8]);
-		cubies[17] = matrix_multiply(rotation, cubies[17]);
-		cubies[26] = matrix_multiply(rotation, cubies[26]);
-
-		cubies[5] = matrix_multiply(rotation, cubies[5]);
-		cubies[14] = matrix_multiply(rotation, cubies[14]);
-		cubies[23] = matrix_multiply(rotation, cubies[23]);
-
-		cubies[2] = matrix_multiply(rotation, cubies[2]);
-		cubies[11] = matrix_multiply(rotation, cubies[11]);
-		cubies[20] = matrix_multiply(rotation, cubies[20]);
+	for(int i = 0; i < CALL_COUNT; i++)
+	{
+		for(int i = 0; i < 9; i++)
+		{
+			cubies[i_front[i]] = matrix_multiply(rotation, cubies[i_front[i]]);
+		}
 
 		display();
 	}
@@ -165,17 +159,10 @@ void up_animation()
 	mat4 rotation = rotation_y_matrix(ROTATION_BOUND);
 	for(int i = 0; i < CALL_COUNT; i++)
 	{
-		cubies[6] = matrix_multiply(rotation, cubies[6]);
-		cubies[15] = matrix_multiply(rotation, cubies[15]);
-		cubies[24] = matrix_multiply(rotation, cubies[24]);
-
-		cubies[7] = matrix_multiply(rotation, cubies[7]);
-		cubies[16] = matrix_multiply(rotation, cubies[16]);
-		cubies[25] = matrix_multiply(rotation, cubies[25]);
-
-		cubies[8] = matrix_multiply(rotation, cubies[8]);
-		cubies[17] = matrix_multiply(rotation, cubies[17]);
-		cubies[26] = matrix_multiply(rotation, cubies[26]);
+		for(int i = 0; i < 9; i++)
+		{
+			cubies[i_up[i]] = matrix_multiply(rotation, cubies[i_up[i]]);
+		}
 
 		display();
 	}
@@ -204,24 +191,15 @@ void up()
 void down_animation()
 {
 	mat4 rotation = rotation_y_matrix(-ROTATION_BOUND);
-
 	for(int i = 0; i < CALL_COUNT; i++)
 	{
-		cubies[2] = matrix_multiply(rotation, cubies[2]);
-		cubies[11] = matrix_multiply(rotation, cubies[11]);
-		cubies[20] = matrix_multiply(rotation, cubies[20]);
-
-		cubies[1] = matrix_multiply(rotation, cubies[1]);
-		cubies[10] = matrix_multiply(rotation, cubies[10]);
-		cubies[19] = matrix_multiply(rotation, cubies[19]);
-
-		cubies[0] = matrix_multiply(rotation, cubies[0]);
-		cubies[9] = matrix_multiply(rotation, cubies[9]);
-		cubies[18] = matrix_multiply(rotation, cubies[18]);
+		for(int i = 0; i < 9; i++)
+		{
+			cubies[i_down[i]] = matrix_multiply(rotation, cubies[i_down[i]]);
+		}
 
 		display();
 	}
-
 }
 
 void down()
@@ -250,17 +228,10 @@ void right_animation()
 
 	for(int i = 0; i < CALL_COUNT; i++)
 	{
-		cubies[26] = matrix_multiply(rotation, cubies[26]);
-		cubies[25] = matrix_multiply(rotation, cubies[25]);
-		cubies[24] = matrix_multiply(rotation, cubies[24]);
-
-		cubies[23] = matrix_multiply(rotation, cubies[23]);
-		cubies[22] = matrix_multiply(rotation, cubies[22]);
-		cubies[21] = matrix_multiply(rotation, cubies[21]);
-
-		cubies[20] = matrix_multiply(rotation, cubies[20]);
-		cubies[19] = matrix_multiply(rotation, cubies[19]);
-		cubies[18] = matrix_multiply(rotation, cubies[18]);
+		for(int i = 0; i < 9; i++)
+		{
+			cubies[i_right[i]] = matrix_multiply(rotation, cubies[i_right[i]]);
+		}
 
 		display();
 	}
@@ -292,17 +263,10 @@ void left_animation()
 
 	for(int i = 0; i < CALL_COUNT; i++)
 	{
-		cubies[6] = matrix_multiply(rotation, cubies[6]);
-		cubies[7] = matrix_multiply(rotation, cubies[7]);
-		cubies[8] = matrix_multiply(rotation, cubies[8]);
-
-		cubies[3] = matrix_multiply(rotation, cubies[3]);
-		cubies[4] = matrix_multiply(rotation, cubies[4]);
-		cubies[5] = matrix_multiply(rotation, cubies[5]);
-
-		cubies[0] = matrix_multiply(rotation, cubies[0]);
-		cubies[1] = matrix_multiply(rotation, cubies[1]);
-		cubies[2] = matrix_multiply(rotation, cubies[2]);
+		for(int i = 0; i < 9; i++)
+		{
+			cubies[i_left[i]] = matrix_multiply(rotation, cubies[i_left[i]]);
+		}
 
 		display();
 	}
