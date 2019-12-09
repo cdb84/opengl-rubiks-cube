@@ -34,10 +34,14 @@
 #define CUBIES 27
 #define VERTICES_SIZE CUBE_VERTICES*CUBIES
 #define DEGREE_DELTA 2
-#define ROTATION_BOUND DEGREE_DELTA * (M_PI/180)
-#define CALL_COUNT 90/DEGREE_DELTA
+#define TROTATION_BOUND DEGREE_DELTA * (M_PI/180)
+#define TCALL_COUNT 90/DEGREE_DELTA
 #define GAP 0.01
 #define SCRAMBLE_DEPTH 40
+
+// int DEGREE_DELTA = 2;
+int CALL_COUNT = 90/DEGREE_DELTA;
+float ROTATION_BOUND = DEGREE_DELTA * (M_PI/180);
 
 
 void keyboard(unsigned char, int, int);
@@ -327,6 +331,9 @@ void left()
 
 void shuffle()
 {
+	CALL_COUNT = 1;
+	ROTATION_BOUND = 90 * (M_PI/180);
+
 	srand(time(NULL));
 	char s[SCRAMBLE_DEPTH];
 	for(int i = 0; i < SCRAMBLE_DEPTH; i++)
@@ -366,6 +373,8 @@ void shuffle()
 		delay(1);
 	}
 	puts("Done scrambling!");
+	CALL_COUNT = TCALL_COUNT;
+	ROTATION_BOUND = TROTATION_BOUND;
 }
 
 void solve()
