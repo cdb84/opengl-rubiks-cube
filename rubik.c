@@ -20,10 +20,13 @@
 
 #include "initShader.h"
 #include "libmatrix.h"
+#include "solve_rc.c"
 
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
+#include <stdlib.h>
 
 #define BUFFER_OFFSET(offset) ((GLvoid *)(offset))
 #define CUBE_SIZE 0.15
@@ -54,18 +57,19 @@ vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
 float eye_degree = 0.05;
 
 mat4 ctm_back, ctm_front, ctm_up, ctm_down, ctm_right, ctm_left;
-int range_back[9];
-int range_front[9];
-int range_up[9];
-int range_down[9];
-int range_right[9];
-int range_left[9];
+int range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
+int range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
+int range_up[9] = {CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8, CUBE_VERTICES*15, CUBE_VERTICES*16, CUBE_VERTICES*17, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
+int range_down[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*9, CUBE_VERTICES*10, CUBE_VERTICES*11, CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20};
+int range_right[9] = {CUBE_VERTICES*18, CUBE_VERTICES*19, CUBE_VERTICES*20, CUBE_VERTICES*21, CUBE_VERTICES*22, CUBE_VERTICES*23, CUBE_VERTICES*24, CUBE_VERTICES*25, CUBE_VERTICES*26};
+int range_left[9] = {0, CUBE_VERTICES, CUBE_VERTICES*2, CUBE_VERTICES*3, CUBE_VERTICES*4, CUBE_VERTICES*5, CUBE_VERTICES*6, CUBE_VERTICES*7, CUBE_VERTICES*8};
 
 
 void back()
 {
 	rotation_matrix = identity();
 	ctm_back = matrix_multiply(rotation_z_matrix(90 * (M_PI/180)), ctm_back);
+	r_string_back();
 	
 }
 
@@ -73,47 +77,113 @@ void front()
 {
 	rotation_matrix = identity();
 	ctm_front = matrix_multiply(rotation_z_matrix(-90 * (M_PI/180)), ctm_front);
+	r_string_front();
 }
 
 void up()
 {
 	rotation_matrix = identity();
 	ctm_up = matrix_multiply(rotation_y_matrix(ROTATION_BOUND), ctm_up);
+	r_string_up();
 }
 
 void down()
 {
 	rotation_matrix = identity();
 	ctm_down = matrix_multiply(rotation_y_matrix(ROTATION_BOUND), ctm_down);
+	r_string_down();
 }
 
 void right()
 {
 	rotation_matrix = identity();
 	ctm_right = matrix_multiply(rotation_x_matrix(ROTATION_BOUND), ctm_right);
+	r_string_right();
 }
 
 void left()
 {
 	rotation_matrix = identity();
 	ctm_left = matrix_multiply(rotation_x_matrix(ROTATION_BOUND), ctm_left);
+	r_string_left();
+}
+void delay(int number_of_seconds) 
+{ 
+    // Converting time into milli_seconds 
+    int milli_seconds = 1000 * number_of_seconds; 
+  
+    // Stroing start time 
+    clock_t start_time = clock(); 
+  
+    // looping till required time is not acheived 
+    while (clock() < start_time + milli_seconds) 
+        ; 
+} 
+void keyboard(unsigned char, int, int);
+#define SCRAMBLE_DEPTH 40
+void shuffle()
+{
+	srand(time(NULL));
+	char s[SCRAMBLE_DEPTH];
+	for(int i = 0; i < SCRAMBLE_DEPTH; i++)
+	{
+		char t;
+		int c = rand() % 6;
+		switch(c){
+			case 0:
+				t = 'U';
+				break;
+			case 1:
+				t = 'D';
+				break;
+			case 2:
+				t = 'L';
+				break;
+			case 3:
+				t = 'R';
+				break;
+			case 4:
+				t = 'B';
+				break;
+			case 5:
+				t = 'F';
+				break;
+			default:
+				t = 'U';
+		}
+		s[i] = t;
+	}
+
+	puts(s);
+	for(int i = 0; i < SCRAMBLE_DEPTH; i++)
+	{
+		printf("%c ", s[i]);
+		keyboard(s[i], 0, 0);
+		delay(1);
+	}
+	puts("Done scrambling!");
+}
+
+void solve()
+{
+
 }
 
 void arrays_init(void)
 {
-	int t_range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
-	int t_range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
-	int t_range_up[9] = {t_range_back[2], CUBE_VERTICES*7, t_range_front[2], t_range_back[5], CUBE_VERTICES*16, t_range_front[5], t_range_back[8], CUBE_VERTICES*25, t_range_front[8]};
-	int t_range_down[9] = {t_range_back[0], CUBE_VERTICES, t_range_front[0], t_range_back[3], CUBE_VERTICES*10, t_range_front[3], t_range_back[6], CUBE_VERTICES*19, t_range_front[6]};
-	int t_range_right[9] = {t_range_down[6], t_range_down[7], t_range_front[6], t_range_back[7], CUBE_VERTICES*22, t_range_front[7], t_range_up[6], t_range_up[7], t_range_up[8]};
-	int t_range_left[9] = {t_range_down[0], t_range_down[1], t_range_down[2], t_range_back[1], CUBE_VERTICES*4, t_range_front[1], t_range_up[0], t_range_up[1], t_range_front[2]};
+	// int t_range_back[9] = {0, CUBE_VERTICES*3, CUBE_VERTICES*6, CUBE_VERTICES*9, CUBE_VERTICES*12, CUBE_VERTICES*15, CUBE_VERTICES*18, CUBE_VERTICES*21, CUBE_VERTICES*24};
+	// int t_range_front[9] = {CUBE_VERTICES*2, CUBE_VERTICES*5, CUBE_VERTICES*8, CUBE_VERTICES*11, CUBE_VERTICES*14, CUBE_VERTICES*17, CUBE_VERTICES*20, CUBE_VERTICES*23, CUBE_VERTICES*26};
+	// int t_range_up[9] = {t_range_back[2], CUBE_VERTICES*7, t_range_front[2], t_range_back[5], CUBE_VERTICES*16, t_range_front[5], t_range_back[8], CUBE_VERTICES*25, t_range_front[8]};
+	// int t_range_down[9] = {t_range_back[0], CUBE_VERTICES, t_range_front[0], t_range_back[3], CUBE_VERTICES*10, t_range_front[3], t_range_back[6], CUBE_VERTICES*19, t_range_front[6]};
+	// int t_range_right[9] = {t_range_down[6], t_range_down[7], t_range_front[6], t_range_back[7], CUBE_VERTICES*22, t_range_front[7], t_range_up[6], t_range_up[7], t_range_up[8]};
+	// int t_range_left[9] = {t_range_down[0], t_range_down[1], t_range_down[2], t_range_back[1], CUBE_VERTICES*4, t_range_front[1], t_range_up[0], t_range_up[1], t_range_front[2]};
 
-	memcpy(range_back, t_range_back, sizeof(t_range_back));
-	memcpy(range_front, t_range_front, sizeof(t_range_front));
-	memcpy(range_up, t_range_up, sizeof(t_range_up));
-	memcpy(range_down, t_range_down, sizeof(t_range_down));
-	memcpy(range_right, t_range_right, sizeof(t_range_right));
-	memcpy(range_left, t_range_left, sizeof(t_range_left));
+	// memcpy(range_back, t_range_back, sizeof(t_range_back));
+	// memcpy(range_front, t_range_front, sizeof(t_range_front));
+	// memcpy(range_up, t_range_up, sizeof(t_range_up));
+	// memcpy(range_down, t_range_down, sizeof(t_range_down));
+	// memcpy(range_right, t_range_right, sizeof(t_range_right));
+	// memcpy(range_left, t_range_left, sizeof(t_range_left));
 
 	ctm_back = ctm_front = ctm_up = ctm_down = ctm_right = ctm_left = rotation_matrix = identity();
 	origin_matrix = translate(-(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2, -(CUBE_SIZE-GAP)/2);
@@ -300,23 +370,22 @@ void display(void)
 
 void keyboard(unsigned char key, int mousex, int mousey)
 {
-	printf("key: %i\n", key);
+	// printf("key: %i\n", key);
 	if (key == 'q')
 		exit(0);
 	if (key == 'p')
 		rotation_matrix = matrix_multiply(rotation_y_matrix(eye_degree), rotation_matrix);
-		matrix_print(rotation_matrix);
 	if (key == '[')
 		rotation_matrix = identity();
 
-	if (key == 'f') front();
-	if (key == 'r') right();
-	if (key == 'u') up();
-	if (key == 'l') left();
-	if (key == 'b') back();
-	if (key == 'd') down();
-	if (key == 's');
-	//glutPostRedisplay();
+	if (key == 'f' || key == 'F') front();
+	if (key == 'r' || key == 'R') right();
+	if (key == 'u' || key == 'U') up();
+	if (key == 'l' || key == 'L') left();
+	if (key == 'b' || key == 'B') back();
+	if (key == 'd' || key == 'D') down();
+	if (key == 's') shuffle();
+	if (key == 13) solve();
 }
 void idle(void)
 {
