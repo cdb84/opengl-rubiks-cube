@@ -60,7 +60,7 @@ mat4 origin_matrix;
 vec4 eye_position = {0.0, 0.0, -0.25, 1.0};
 vec4 at_vector = {0.0, 0.0, 0.0, 1.0};
 vec4 up_vector = {0.0, 1.0, 0.0, 1.0};
-float eye_degree = 0.05;
+float eye_degree = 0.005;
 
 mat4 ctm_back, ctm_front, ctm_up, ctm_down, ctm_right, ctm_left;
 
@@ -98,6 +98,18 @@ void back()
 	cubies[9] = matrix_multiply(rotation, cubies[9]);
 	cubies[0] = matrix_multiply(rotation, cubies[0]);
 
+	mat4 s = cubies[18];
+	cubies[18] = cubies[0];
+	cubies[0] = cubies[6];
+	cubies[6] = cubies[24];
+	cubies[24] = s;
+
+	s = cubies[3];
+	cubies[3] = cubies[15];
+	cubies[15] = cubies[21];
+	cubies[21] = cubies[9];
+	cubies[9] = s;
+	
 	r_string_back();
 	
 }
@@ -119,6 +131,18 @@ void front()
 	cubies[11] = matrix_multiply(rotation, cubies[11]);
 	cubies[20] = matrix_multiply(rotation, cubies[20]);
 
+	mat4 s = cubies[8];
+	cubies[8] = cubies[2];
+	cubies[2] = cubies[20];
+	cubies[20] = cubies[26];
+	cubies[26] = s;
+
+	s = cubies[17];
+	cubies[17] = cubies[5];
+	cubies[5] = cubies[11];
+	cubies[11] = cubies[23];
+	cubies[23] = s;
+
 	r_string_front();
 }
 
@@ -131,13 +155,25 @@ void up()
 	cubies[15] = matrix_multiply(rotation, cubies[15]);
 	cubies[24] = matrix_multiply(rotation, cubies[24]);
 
-	cubies[9] = matrix_multiply(rotation, cubies[9]);
+	cubies[7] = matrix_multiply(rotation, cubies[7]);
 	cubies[16] = matrix_multiply(rotation, cubies[16]);
 	cubies[25] = matrix_multiply(rotation, cubies[25]);
 
 	cubies[8] = matrix_multiply(rotation, cubies[8]);
 	cubies[17] = matrix_multiply(rotation, cubies[17]);
 	cubies[26] = matrix_multiply(rotation, cubies[26]);
+
+	mat4 s = cubies[6];
+	cubies[6] = cubies[8];
+	cubies[8] = cubies[26];
+	cubies[26] = cubies[24];
+	cubies[24] = s;
+
+	s = cubies[15];
+	cubies[15] = cubies[7];
+	cubies[7] = cubies[17];
+	cubies[17] = cubies[25];
+	cubies[25] = s;
 
 	r_string_up();
 }
@@ -158,6 +194,19 @@ void down()
 	cubies[0] = matrix_multiply(rotation, cubies[0]);
 	cubies[9] = matrix_multiply(rotation, cubies[9]);
 	cubies[18] = matrix_multiply(rotation, cubies[18]);
+
+	mat4 s = cubies[2];
+	cubies[2] = cubies[0];
+	cubies[0] = cubies[18];
+	cubies[18] = cubies[20];
+	cubies[20] = s;
+
+	s = cubies[11];
+	cubies[11] = cubies[1];
+	cubies[1] = cubies[9];
+	cubies[9] = cubies[19];
+	cubies[19] = s;
+
 	r_string_down();
 }
 
@@ -177,6 +226,19 @@ void right()
 	cubies[20] = matrix_multiply(rotation, cubies[20]);
 	cubies[19] = matrix_multiply(rotation, cubies[19]);
 	cubies[18] = matrix_multiply(rotation, cubies[18]);
+
+	mat4 s = cubies[26];
+	cubies[26] = cubies[20];
+	cubies[20] = cubies[18];
+	cubies[18] = cubies[24];
+	cubies[24] = s;
+
+	s = cubies[25];
+	cubies[25] = cubies[23];
+	cubies[23] = cubies[19];
+	cubies[19] = cubies[21];
+	cubies[21] = s;
+
 	r_string_right();
 }
 
@@ -196,6 +258,19 @@ void left()
 	cubies[0] = matrix_multiply(rotation, cubies[0]);
 	cubies[1] = matrix_multiply(rotation, cubies[1]);
 	cubies[2] = matrix_multiply(rotation, cubies[2]);
+
+	mat4 s = cubies[6];
+	cubies[6] = cubies[0];
+	cubies[0] = cubies[2];
+	cubies[2] = cubies[8];
+	cubies[8] = s;
+
+	s = cubies[7];
+	cubies[7] = cubies[3];
+	cubies[3] = cubies[1];
+	cubies[1] = cubies[5];
+	cubies[5] = s;
+
 	r_string_left();
 }
 
@@ -442,6 +517,8 @@ void keyboard(unsigned char key, int mousex, int mousey)
 		exit(0);
 	if (key == 'p')
 		rotation_matrix = matrix_multiply(rotation_y_matrix(eye_degree), rotation_matrix);
+	if (key == 'P')
+		rotation_matrix = matrix_multiply(rotation_x_matrix(eye_degree), rotation_matrix);
 	if (key == '[')
 		rotation_matrix = identity();
 
@@ -473,7 +550,7 @@ int main(int argc, char **argv)
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(512, 512);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("Cubes with CTM");
+	glutCreateWindow("Rubik's Cube");
 	glewInit();
 	init();
 	glutDisplayFunc(display);
