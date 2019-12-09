@@ -33,8 +33,9 @@
 #define CUBE_VERTICES 36
 #define CUBIES 27
 #define VERTICES_SIZE CUBE_VERTICES*CUBIES
-#define ROTATION_BOUND 1 * (M_PI/180)
-#define CALL_COUNT 90
+#define DEGREE_DELTA 2
+#define ROTATION_BOUND DEGREE_DELTA * (M_PI/180)
+#define CALL_COUNT 90/DEGREE_DELTA
 #define GAP 0.01
 #define SCRAMBLE_DEPTH 40
 
@@ -49,6 +50,7 @@ GLuint ctm_location;
 mat4 rotation_matrix;
 mat4 origin_matrix;
 
+int animating = 0;
 int calls = 0;
 void (* ctm_update_fn)();
 
@@ -68,26 +70,32 @@ void nothing()
 
 void back_animation()
 {
-	calls ++;
 	mat4 rotation = rotation_z_matrix(-ROTATION_BOUND);
-	cubies[24] = matrix_multiply(rotation, cubies[24]);
-	cubies[15] = matrix_multiply(rotation, cubies[15]);
-	cubies[6] = matrix_multiply(rotation, cubies[6]);
 
-	cubies[21] = matrix_multiply(rotation, cubies[21]);
-	cubies[12] = matrix_multiply(rotation, cubies[12]);
-	cubies[3] = matrix_multiply(rotation, cubies[3]);
+	for(int i = 0; i < CALL_COUNT; i++)
+	{
+		cubies[24] = matrix_multiply(rotation, cubies[24]);
+		cubies[15] = matrix_multiply(rotation, cubies[15]);
+		cubies[6] = matrix_multiply(rotation, cubies[6]);
 
-	cubies[18] = matrix_multiply(rotation, cubies[18]);
-	cubies[9] = matrix_multiply(rotation, cubies[9]);
-	cubies[0] = matrix_multiply(rotation, cubies[0]);
+		cubies[21] = matrix_multiply(rotation, cubies[21]);
+		cubies[12] = matrix_multiply(rotation, cubies[12]);
+		cubies[3] = matrix_multiply(rotation, cubies[3]);
+
+		cubies[18] = matrix_multiply(rotation, cubies[18]);
+		cubies[9] = matrix_multiply(rotation, cubies[9]);
+		cubies[0] = matrix_multiply(rotation, cubies[0]);
+
+		display();
+	}
+	
 }
 
 void back()
 {
 	puts("Back");
 	rotation_matrix = identity();
-	ctm_update_fn = back_animation;
+	back_animation();
 
 	mat4 s = cubies[18];
 	cubies[18] = cubies[24];
@@ -107,27 +115,30 @@ void back()
 
 void front_animation()
 {
-	calls ++;
 	mat4 rotation = rotation_z_matrix(ROTATION_BOUND);
 
-	cubies[8] = matrix_multiply(rotation, cubies[8]);
-	cubies[17] = matrix_multiply(rotation, cubies[17]);
-	cubies[26] = matrix_multiply(rotation, cubies[26]);
+	for(int i = 0; i < CALL_COUNT; i++){
+		cubies[8] = matrix_multiply(rotation, cubies[8]);
+		cubies[17] = matrix_multiply(rotation, cubies[17]);
+		cubies[26] = matrix_multiply(rotation, cubies[26]);
 
-	cubies[5] = matrix_multiply(rotation, cubies[5]);
-	cubies[14] = matrix_multiply(rotation, cubies[14]);
-	cubies[23] = matrix_multiply(rotation, cubies[23]);
+		cubies[5] = matrix_multiply(rotation, cubies[5]);
+		cubies[14] = matrix_multiply(rotation, cubies[14]);
+		cubies[23] = matrix_multiply(rotation, cubies[23]);
 
-	cubies[2] = matrix_multiply(rotation, cubies[2]);
-	cubies[11] = matrix_multiply(rotation, cubies[11]);
-	cubies[20] = matrix_multiply(rotation, cubies[20]);
+		cubies[2] = matrix_multiply(rotation, cubies[2]);
+		cubies[11] = matrix_multiply(rotation, cubies[11]);
+		cubies[20] = matrix_multiply(rotation, cubies[20]);
+
+		display();
+	}
 }
 
 void front()
 {
 	puts("Front");
 	rotation_matrix = identity();
-	ctm_update_fn = front_animation;
+	front_animation();
 
 	mat4 s = cubies[8];
 	cubies[8] = cubies[26];
@@ -146,27 +157,30 @@ void front()
 
 void up_animation()
 {
-	calls ++;
 	mat4 rotation = rotation_y_matrix(ROTATION_BOUND);
+	for(int i = 0; i < CALL_COUNT; i++)
+	{
+		cubies[6] = matrix_multiply(rotation, cubies[6]);
+		cubies[15] = matrix_multiply(rotation, cubies[15]);
+		cubies[24] = matrix_multiply(rotation, cubies[24]);
 
-	cubies[6] = matrix_multiply(rotation, cubies[6]);
-	cubies[15] = matrix_multiply(rotation, cubies[15]);
-	cubies[24] = matrix_multiply(rotation, cubies[24]);
+		cubies[7] = matrix_multiply(rotation, cubies[7]);
+		cubies[16] = matrix_multiply(rotation, cubies[16]);
+		cubies[25] = matrix_multiply(rotation, cubies[25]);
 
-	cubies[7] = matrix_multiply(rotation, cubies[7]);
-	cubies[16] = matrix_multiply(rotation, cubies[16]);
-	cubies[25] = matrix_multiply(rotation, cubies[25]);
+		cubies[8] = matrix_multiply(rotation, cubies[8]);
+		cubies[17] = matrix_multiply(rotation, cubies[17]);
+		cubies[26] = matrix_multiply(rotation, cubies[26]);
 
-	cubies[8] = matrix_multiply(rotation, cubies[8]);
-	cubies[17] = matrix_multiply(rotation, cubies[17]);
-	cubies[26] = matrix_multiply(rotation, cubies[26]);
+		display();
+	}
 }
 
 void up()
 {
 	puts("Up");
 	rotation_matrix = identity();
-	ctm_update_fn = up_animation;
+	up_animation();
 
 	mat4 s = cubies[6];
 	cubies[6] = cubies[24];
@@ -184,27 +198,32 @@ void up()
 }
 void down_animation()
 {
-	calls++;
 	mat4 rotation = rotation_y_matrix(-ROTATION_BOUND);
 
-	cubies[2] = matrix_multiply(rotation, cubies[2]);
-	cubies[11] = matrix_multiply(rotation, cubies[11]);
-	cubies[20] = matrix_multiply(rotation, cubies[20]);
+	for(int i = 0; i < CALL_COUNT; i++)
+	{
+		cubies[2] = matrix_multiply(rotation, cubies[2]);
+		cubies[11] = matrix_multiply(rotation, cubies[11]);
+		cubies[20] = matrix_multiply(rotation, cubies[20]);
 
-	cubies[1] = matrix_multiply(rotation, cubies[1]);
-	cubies[10] = matrix_multiply(rotation, cubies[10]);
-	cubies[19] = matrix_multiply(rotation, cubies[19]);
+		cubies[1] = matrix_multiply(rotation, cubies[1]);
+		cubies[10] = matrix_multiply(rotation, cubies[10]);
+		cubies[19] = matrix_multiply(rotation, cubies[19]);
 
-	cubies[0] = matrix_multiply(rotation, cubies[0]);
-	cubies[9] = matrix_multiply(rotation, cubies[9]);
-	cubies[18] = matrix_multiply(rotation, cubies[18]);
+		cubies[0] = matrix_multiply(rotation, cubies[0]);
+		cubies[9] = matrix_multiply(rotation, cubies[9]);
+		cubies[18] = matrix_multiply(rotation, cubies[18]);
+
+		display();
+	}
+
 }
 
 void down()
 {
 	puts("Down");
 	rotation_matrix = identity();
-	ctm_update_fn = down_animation;
+	down_animation();
 
 	mat4 s = cubies[2];
 	cubies[2] = cubies[20];
@@ -222,27 +241,31 @@ void down()
 }
 void right_animation()
 {
-	calls ++;
 	mat4 rotation = rotation_x_matrix(ROTATION_BOUND);
 
-	cubies[26] = matrix_multiply(rotation, cubies[26]);
-	cubies[25] = matrix_multiply(rotation, cubies[25]);
-	cubies[24] = matrix_multiply(rotation, cubies[24]);
+	for(int i = 0; i < CALL_COUNT; i++)
+	{
+		cubies[26] = matrix_multiply(rotation, cubies[26]);
+		cubies[25] = matrix_multiply(rotation, cubies[25]);
+		cubies[24] = matrix_multiply(rotation, cubies[24]);
 
-	cubies[23] = matrix_multiply(rotation, cubies[23]);
-	cubies[22] = matrix_multiply(rotation, cubies[22]);
-	cubies[21] = matrix_multiply(rotation, cubies[21]);
+		cubies[23] = matrix_multiply(rotation, cubies[23]);
+		cubies[22] = matrix_multiply(rotation, cubies[22]);
+		cubies[21] = matrix_multiply(rotation, cubies[21]);
 
-	cubies[20] = matrix_multiply(rotation, cubies[20]);
-	cubies[19] = matrix_multiply(rotation, cubies[19]);
-	cubies[18] = matrix_multiply(rotation, cubies[18]);
+		cubies[20] = matrix_multiply(rotation, cubies[20]);
+		cubies[19] = matrix_multiply(rotation, cubies[19]);
+		cubies[18] = matrix_multiply(rotation, cubies[18]);
+
+		display();
+	}
 }
 
 void right()
 {
 	puts("Right");
 	rotation_matrix = identity();
-	ctm_update_fn = right_animation;
+	right_animation();
 
 	mat4 s = cubies[26];
 	cubies[26] = cubies[24];
@@ -260,27 +283,31 @@ void right()
 }
 void left_animation()
 {
-	calls++;
 	mat4 rotation = rotation_x_matrix(-ROTATION_BOUND);
 
-	cubies[6] = matrix_multiply(rotation, cubies[6]);
-	cubies[7] = matrix_multiply(rotation, cubies[7]);
-	cubies[8] = matrix_multiply(rotation, cubies[8]);
+	for(int i = 0; i < CALL_COUNT; i++)
+	{
+		cubies[6] = matrix_multiply(rotation, cubies[6]);
+		cubies[7] = matrix_multiply(rotation, cubies[7]);
+		cubies[8] = matrix_multiply(rotation, cubies[8]);
 
-	cubies[3] = matrix_multiply(rotation, cubies[3]);
-	cubies[4] = matrix_multiply(rotation, cubies[4]);
-	cubies[5] = matrix_multiply(rotation, cubies[5]);
+		cubies[3] = matrix_multiply(rotation, cubies[3]);
+		cubies[4] = matrix_multiply(rotation, cubies[4]);
+		cubies[5] = matrix_multiply(rotation, cubies[5]);
 
-	cubies[0] = matrix_multiply(rotation, cubies[0]);
-	cubies[1] = matrix_multiply(rotation, cubies[1]);
-	cubies[2] = matrix_multiply(rotation, cubies[2]);
+		cubies[0] = matrix_multiply(rotation, cubies[0]);
+		cubies[1] = matrix_multiply(rotation, cubies[1]);
+		cubies[2] = matrix_multiply(rotation, cubies[2]);
+
+		display();
+	}
 }
 
 void left()
 {
 	puts("Left");
 	rotation_matrix = identity();
-	ctm_update_fn = left_animation;
+	left_animation();
 
 	mat4 s = cubies[6];
 	cubies[6] = cubies[8];
@@ -521,25 +548,18 @@ void display(void)
 	// set polygon modes to fill triangles in from the front, and mesh lines in the back
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glPolygonMode(GL_BACK, GL_LINE);
-
 	for(int i = 0; i < CUBIES; i++)
 	{
 		glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&cubies[i]);
 		glDrawArrays(GL_TRIANGLES, i*36, CUBE_VERTICES);
 	}
-	ctm_update_fn();	
-	if(calls >= CALL_COUNT) 
-	{
-		ctm_update_fn = nothing;
-		calls = 0;
-	}
+	
 	// right now we will only draw the front, with it's respective CTM
 	glutSwapBuffers();
 }
 
 void keyboard(unsigned char key, int mousex, int mousey)
 {
-	if (calls != 0) return;
 	// printf("key: %i\n", key);
 	if (key == 'q')
 		exit(0);
