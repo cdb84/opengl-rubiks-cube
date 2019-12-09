@@ -92,7 +92,20 @@ void back()
 void front()
 {
 	rotation_matrix = identity();
-	ctm_front = matrix_multiply(rotation_z_matrix(-90 * (M_PI/180)), ctm_front);
+	mat4 rotation = rotation_z_matrix(-ROTATION_BOUND);
+	cubies[8] = matrix_multiply(rotation, cubies[8]);
+	cubies[17] = matrix_multiply(rotation, cubies[17]);
+	cubies[26] = matrix_multiply(rotation, cubies[26]);
+
+	cubies[5] = matrix_multiply(rotation, cubies[5]);
+	cubies[14] = matrix_multiply(rotation, cubies[14]);
+	cubies[23] = matrix_multiply(rotation, cubies[23]);
+
+	cubies[2] = matrix_multiply(rotation, cubies[2]);
+	cubies[11] = matrix_multiply(rotation, cubies[11]);
+	cubies[20] = matrix_multiply(rotation, cubies[20]);
+
+	// ctm_front = matrix_multiply(rotation_z_matrix(-90 * (M_PI/180)), ctm_front);
 	r_string_front();
 }
 
@@ -382,12 +395,16 @@ void keyboard(unsigned char key, int mousex, int mousey)
 }
 void idle(void)
 {
-	ctm_back = matrix_multiply(ctm_back, rotation_matrix);
-	ctm_front = matrix_multiply(ctm_front, rotation_matrix);
-	ctm_up = matrix_multiply(ctm_up, rotation_matrix);
-	ctm_down = matrix_multiply(ctm_down, rotation_matrix);
-	ctm_right = matrix_multiply(ctm_right, rotation_matrix);
-	ctm_left = matrix_multiply(ctm_left, rotation_matrix);
+	for(int i = 0; i < CUBIES; i++)
+	{
+		cubies[i] = matrix_multiply(cubies[i], rotation_matrix);
+	}
+	// ctm_back = matrix_multiply(ctm_back, rotation_matrix);
+	// ctm_front = matrix_multiply(ctm_front, rotation_matrix);
+	// ctm_up = matrix_multiply(ctm_up, rotation_matrix);
+	// ctm_down = matrix_multiply(ctm_down, rotation_matrix);
+	// ctm_right = matrix_multiply(ctm_right, rotation_matrix);
+	// ctm_left = matrix_multiply(ctm_left, rotation_matrix);
 	
 	glutPostRedisplay();
 }
