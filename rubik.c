@@ -88,7 +88,7 @@ void back_animation()
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			cubies[i_back[i]] = matrix_multiply(rotation, cubies[i_back[i]]);
+			cubies[i_back[i]] = matrix_multiply(cubies[i_back[i]], rotation);
 		}
 
 		display();
@@ -101,6 +101,7 @@ void back()
 	puts("Back");
 	rotation_matrix = identity();
 	back_animation();
+
 
 	// change backs
 	int s = i_back[0];
@@ -130,6 +131,11 @@ void back()
 	i_up[1] = i_back[1];
 	i_up[2] = i_back[0];
 
+	//change down
+	i_down[6] = i_back[8];
+	i_down[7] = i_back[7];
+	i_down[8] = i_back[6];
+
 	r_string_back();
 	
 }
@@ -142,7 +148,7 @@ void front_animation()
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			cubies[i_front[i]] = matrix_multiply(rotation, cubies[i_front[i]]);
+			cubies[i_front[i]] = matrix_multiply(cubies[i_front[i]], rotation);
 		}
 
 		display();
@@ -153,20 +159,41 @@ void front()
 {
 	puts("Front");
 	rotation_matrix = identity();
-	
-
-	mat4 s = cubies[8];
-	cubies[8] = cubies[2];
-	cubies[2] = cubies[20];
-	cubies[20] = cubies[26];
-	cubies[26] = s;
-
-	s = cubies[17];
-	cubies[17] = cubies[5];
-	cubies[5] = cubies[11];
-	cubies[11] = cubies[23];
-	cubies[23] = s;
 	front_animation();
+
+	// change fronts
+	int s = i_front[0];
+	i_front[0] = i_front[6];
+	i_front[6] = i_front[8];
+	i_front[8] = i_front[2];
+	i_front[2] = s;
+
+	s = i_front[1];
+	i_front[1] = i_front[3];
+	i_front[3] = i_front[7];
+	i_front[7] = i_front[5];
+	i_front[5] = s;
+
+	//change rights
+	i_right[0] = i_front[2];
+	i_right[3] = i_front[5];
+	i_right[6] = i_front[8];
+
+	//change lefts
+	i_left[2] = i_front[0];
+	i_left[5] = i_front[3];
+	i_left[8] = i_front[6];
+
+	//change up
+	i_up[6] = i_front[0];
+	i_up[7] = i_front[1];
+	i_up[8] = i_front[2];
+
+	//change down
+	i_down[0] = i_front[6];
+	i_down[1] = i_front[7];
+	i_down[2] = i_front[8];
+
 	r_string_front();
 }
 
@@ -177,7 +204,7 @@ void up_animation()
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			cubies[i_up[i]] = matrix_multiply(rotation, cubies[i_up[i]]);
+			cubies[i_up[i]] = matrix_multiply(cubies[i_up[i]], rotation);
 		}
 
 		display();
@@ -188,20 +215,36 @@ void up()
 {
 	puts("Up");
 	rotation_matrix = identity();
-	
-
-	mat4 s = cubies[6];
-	cubies[6] = cubies[8];
-	cubies[8] = cubies[26];
-	cubies[26] = cubies[24];
-	cubies[24] = s;
-
-	s = cubies[15];
-	cubies[15] = cubies[7];
-	cubies[7] = cubies[17];
-	cubies[17] = cubies[25];
-	cubies[25] = s;
 	up_animation();
+	int s = i_up[0];
+	i_up[0] = i_up[6];
+	i_up[6] = i_up[8];
+	i_up[8] = i_up[2];
+	i_up[2] = s;
+
+	s = i_up[1];
+	i_up[1] = i_up[3];
+	i_up[3] = i_up[7];
+	i_up[7] = i_up[5];
+	i_up[5] = s;
+
+	//change right
+	i_right[0] = i_up[8];
+	i_right[1] = i_up[5];
+	i_right[2] = i_up[2];
+	//change left
+	i_left[0] = i_up[0];
+	i_left[1] = i_up[3];
+	i_left[2] = i_up[6];
+	//change front
+	i_front[0] = i_up[6];
+	i_front[1] = i_up[7];
+	i_front[2] = i_up[8];
+	//change back
+	i_back[0] = i_up[2];
+	i_back[1] = i_up[1];
+	i_back[2] = i_up[0];
+
 	r_string_up();
 }
 void down_animation()
@@ -211,7 +254,7 @@ void down_animation()
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			cubies[i_down[i]] = matrix_multiply(rotation, cubies[i_down[i]]);
+			cubies[i_down[i]] = matrix_multiply(cubies[i_down[i]], rotation);
 		}
 
 		display();
@@ -222,20 +265,35 @@ void down()
 {
 	puts("Down");
 	rotation_matrix = identity();
-	
-
-	mat4 s = cubies[2];
-	cubies[2] = cubies[0];
-	cubies[0] = cubies[18];
-	cubies[18] = cubies[20];
-	cubies[20] = s;
-
-	s = cubies[11];
-	cubies[11] = cubies[1];
-	cubies[1] = cubies[9];
-	cubies[9] = cubies[19];
-	cubies[19] = s;
 	down_animation();
+	int s = i_down[0];
+	i_down[0] = i_down[6];
+	i_down[6] = i_down[8];
+	i_down[8] = i_down[2];
+	i_down[2] = s;
+
+	s = i_down[1];
+	i_down[1] = i_down[3];
+	i_down[3] = i_down[7];
+	i_down[7] = i_down[5];
+	i_down[5] = s;
+
+	//change right
+	i_right[6] = i_down[2];
+	i_right[7] = i_down[5];
+	i_right[8] = i_down[8];
+	//change left
+	i_left[6] = i_down[6];
+	i_left[7] = i_down[3];
+	i_left[8] = i_down[0];
+	//change front
+	i_front[6] = i_down[0];
+	i_front[7] = i_down[1];
+	i_front[8] = i_down[2];
+	//change back
+	i_back[6] = i_down[8];
+	i_back[7] = i_down[7];
+	i_back[8] = i_down[6];
 	r_string_down();
 }
 void right_animation()
@@ -246,7 +304,7 @@ void right_animation()
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			cubies[i_right[i]] = matrix_multiply(rotation, cubies[i_right[i]]);
+			cubies[i_right[i]] = matrix_multiply(cubies[i_right[i]], rotation);
 		}
 
 		display();
@@ -257,20 +315,35 @@ void right()
 {
 	puts("Right");
 	rotation_matrix = identity();
-	
-
-	mat4 s = cubies[26];
-	cubies[26] = cubies[20];
-	cubies[20] = cubies[18];
-	cubies[18] = cubies[24];
-	cubies[24] = s;
-
-	s = cubies[25];
-	cubies[25] = cubies[23];
-	cubies[23] = cubies[19];
-	cubies[19] = cubies[21];
-	cubies[21] = s;
 	right_animation();
+	int s = i_right[0];
+	i_right[0] = i_right[6];
+	i_right[6] = i_right[8];
+	i_right[8] = i_right[2];
+	i_right[2] = s;
+
+	s = i_right[1];
+	i_right[1] = i_right[3];
+	i_right[3] = i_right[7];
+	i_right[7] = i_right[5];
+	i_right[5] = s;
+
+	//change up
+	i_up[8] = i_right[0];
+	i_up[5] = i_right[1];
+	i_up[2] = i_right[2];
+	//change down
+	i_down[2] = i_right[6];
+	i_down[5] = i_right[7];
+	i_down[8] = i_right[8];
+	//change front
+	i_front[2] = i_right[0];
+	i_front[5] = i_right[3];
+	i_front[8] = i_right[6];
+	//change back
+	i_back[0] = i_right[2];
+	i_back[3] = i_right[5];
+	i_back[6] = i_right[8];
 	r_string_right();
 }
 void left_animation()
@@ -281,7 +354,7 @@ void left_animation()
 	{
 		for(int i = 0; i < 9; i++)
 		{
-			cubies[i_left[i]] = matrix_multiply(rotation, cubies[i_left[i]]);
+			cubies[i_left[i]] = matrix_multiply(cubies[i_left[i]], rotation);
 		}
 
 		display();
@@ -292,20 +365,35 @@ void left()
 {
 	puts("Left");
 	rotation_matrix = identity();
-	
-
-	mat4 s = cubies[6];
-	cubies[6] = cubies[0];
-	cubies[0] = cubies[2];
-	cubies[2] = cubies[8];
-	cubies[8] = s;
-
-	s = cubies[7];
-	cubies[7] = cubies[3];
-	cubies[3] = cubies[1];
-	cubies[1] = cubies[5];
-	cubies[5] = s;
 	left_animation();
+	int s = i_left[0];
+	i_left[0] = i_left[6];
+	i_left[6] = i_left[8];
+	i_left[8] = i_left[2];
+	i_left[2] = s;
+
+	s = i_left[1];
+	i_left[1] = i_left[3];
+	i_left[3] = i_left[7];
+	i_left[7] = i_left[5];
+	i_left[5] = s;
+
+	//up
+	i_up[0] = i_left[0];
+	i_up[3] = i_left[1];
+	i_up[6] = i_left[2];
+	//down
+	i_down[6] = i_left[6];
+	i_down[3] = i_left[7];
+	i_down[0] = i_left[8];
+	//front 
+	i_front[0] = i_left[2];
+	i_front[3] = i_left[5];
+	i_front[6] = i_left[8];
+	//back
+	i_back[2] = i_left[0];
+	i_back[5] = i_left[3];
+	i_back[8] = i_left[6];
 	r_string_left();
 }
 
@@ -578,7 +666,7 @@ void idle(void)
 {
 	for(int i = 0; i < CUBIES; i++)
 	{
-		cubies[i] = matrix_multiply(cubies[i], rotation_matrix);
+		cubies[i] = matrix_multiply(rotation_matrix, cubies[i]);
 	}
 	
 	glutPostRedisplay();
