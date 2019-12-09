@@ -34,6 +34,7 @@
 #define CUBIES 27
 #define VERTICES_SIZE CUBE_VERTICES*CUBIES
 #define ROTATION_BOUND 1 * (M_PI/180)
+#define CALL_COUNT 90
 #define GAP 0.01
 #define SCRAMBLE_DEPTH 40
 
@@ -80,11 +81,6 @@ void back_animation()
 	cubies[18] = matrix_multiply(rotation, cubies[18]);
 	cubies[9] = matrix_multiply(rotation, cubies[9]);
 	cubies[0] = matrix_multiply(rotation, cubies[0]);
-	if(calls >= 90) 
-	{
-		ctm_update_fn = nothing;
-		calls = 0;
-	}
 }
 
 void back()
@@ -111,6 +107,7 @@ void back()
 
 void front_animation()
 {
+	calls ++;
 	mat4 rotation = rotation_z_matrix(ROTATION_BOUND);
 
 	cubies[8] = matrix_multiply(rotation, cubies[8]);
@@ -149,6 +146,7 @@ void front()
 
 void up_animation()
 {
+	calls ++;
 	mat4 rotation = rotation_y_matrix(ROTATION_BOUND);
 
 	cubies[6] = matrix_multiply(rotation, cubies[6]);
@@ -186,6 +184,7 @@ void up()
 }
 void down_animation()
 {
+	calls++;
 	mat4 rotation = rotation_y_matrix(-ROTATION_BOUND);
 
 	cubies[2] = matrix_multiply(rotation, cubies[2]);
@@ -223,6 +222,7 @@ void down()
 }
 void right_animation()
 {
+	calls ++;
 	mat4 rotation = rotation_x_matrix(ROTATION_BOUND);
 
 	cubies[26] = matrix_multiply(rotation, cubies[26]);
@@ -260,6 +260,7 @@ void right()
 }
 void left_animation()
 {
+	calls++;
 	mat4 rotation = rotation_x_matrix(-ROTATION_BOUND);
 
 	cubies[6] = matrix_multiply(rotation, cubies[6]);
@@ -526,13 +527,19 @@ void display(void)
 		glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *)&cubies[i]);
 		glDrawArrays(GL_TRIANGLES, i*36, CUBE_VERTICES);
 	}
-	ctm_update_fn();
+	ctm_update_fn();	
+	if(calls >= CALL_COUNT) 
+	{
+		ctm_update_fn = nothing;
+		calls = 0;
+	}
 	// right now we will only draw the front, with it's respective CTM
 	glutSwapBuffers();
 }
 
 void keyboard(unsigned char key, int mousex, int mousey)
 {
+	if (calls != 0) return;
 	// printf("key: %i\n", key);
 	if (key == 'q')
 		exit(0);
