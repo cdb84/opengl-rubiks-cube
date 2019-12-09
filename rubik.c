@@ -63,6 +63,13 @@ float eye_degree = 0.005;
 
 mat4 cubies[CUBIES];
 
+int i_up[9] = {6, 15, 24, 7, 6, 25, 8, 17, 26};
+int i_down[9] = {2, 11, 20, 1, 10, 19, 0, 9, 18};
+int i_right[9] = {26, 25, 24, 23, 22, 21, 20, 19, 18};
+int i_left[9] = {6, 7, 8, 3, 4, 5, 0, 1, 2};
+int i_back[9] = {24, 15, 6, 21, 12, 3, 18, 9, 0};
+int i_front[9] = {8, 17, 26, 5, 14, 23, 2, 11, 20};
+
 void delay(int number_of_seconds) 
 { 
 	int milli_seconds = 1000 * number_of_seconds; 
@@ -79,17 +86,10 @@ void back_animation()
 
 	for(int i = 0; i < CALL_COUNT; i++)
 	{
-		cubies[24] = matrix_multiply(rotation, cubies[24]);
-		cubies[15] = matrix_multiply(rotation, cubies[15]);
-		cubies[6] = matrix_multiply(rotation, cubies[6]);
-
-		cubies[21] = matrix_multiply(rotation, cubies[21]);
-		cubies[12] = matrix_multiply(rotation, cubies[12]);
-		cubies[3] = matrix_multiply(rotation, cubies[3]);
-
-		cubies[18] = matrix_multiply(rotation, cubies[18]);
-		cubies[9] = matrix_multiply(rotation, cubies[9]);
-		cubies[0] = matrix_multiply(rotation, cubies[0]);
+		for(int i = 0; i < 9; i++)
+		{
+			cubies[i_back[i]] = matrix_multiply(rotation, cubies[i_back[i]]);
+		}
 
 		display();
 	}
