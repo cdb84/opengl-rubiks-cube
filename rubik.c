@@ -99,16 +99,16 @@ void back()
 	cubies[0] = matrix_multiply(rotation, cubies[0]);
 
 	mat4 s = cubies[18];
-	cubies[18] = cubies[0];
-	cubies[0] = cubies[6];
-	cubies[6] = cubies[24];
-	cubies[24] = s;
+	cubies[18] = cubies[24];
+	cubies[24] = cubies[6];
+	cubies[6] = cubies[0];
+	cubies[0] = s;
 
 	s = cubies[3];
-	cubies[3] = cubies[15];
-	cubies[15] = cubies[21];
-	cubies[21] = cubies[9];
-	cubies[9] = s;
+	cubies[3] = cubies[9];
+	cubies[9] = cubies[21];
+	cubies[21] = cubies[15];
+	cubies[15] = s;
 	
 	r_string_back();
 	
@@ -132,16 +132,16 @@ void front()
 	cubies[20] = matrix_multiply(rotation, cubies[20]);
 
 	mat4 s = cubies[8];
-	cubies[8] = cubies[2];
-	cubies[2] = cubies[20];
-	cubies[20] = cubies[26];
-	cubies[26] = s;
+	cubies[8] = cubies[26];
+	cubies[26] = cubies[20];
+	cubies[20] = cubies[2];
+	cubies[2] = s;
 
 	s = cubies[17];
-	cubies[17] = cubies[5];
-	cubies[5] = cubies[11];
-	cubies[11] = cubies[23];
-	cubies[23] = s;
+	cubies[17] = cubies[23];
+	cubies[23] = cubies[11];
+	cubies[11] = cubies[5];
+	cubies[5] = s;
 
 	r_string_front();
 }
@@ -164,16 +164,16 @@ void up()
 	cubies[26] = matrix_multiply(rotation, cubies[26]);
 
 	mat4 s = cubies[6];
-	cubies[6] = cubies[8];
-	cubies[8] = cubies[26];
-	cubies[26] = cubies[24];
-	cubies[24] = s;
+	cubies[6] = cubies[24];
+	cubies[24] = cubies[26];
+	cubies[26] = cubies[8];
+	cubies[8] = s;
 
 	s = cubies[15];
-	cubies[15] = cubies[7];
-	cubies[7] = cubies[17];
-	cubies[17] = cubies[25];
-	cubies[25] = s;
+	cubies[15] = cubies[25];
+	cubies[25] = cubies[17];
+	cubies[17] = cubies[7];
+	cubies[7] = s;
 
 	r_string_up();
 }
@@ -196,16 +196,16 @@ void down()
 	cubies[18] = matrix_multiply(rotation, cubies[18]);
 
 	mat4 s = cubies[2];
-	cubies[2] = cubies[0];
-	cubies[0] = cubies[18];
-	cubies[18] = cubies[20];
-	cubies[20] = s;
+	cubies[2] = cubies[20];
+	cubies[20] = cubies[18];
+	cubies[18] = cubies[0];
+	cubies[0] = s;
 
 	s = cubies[11];
-	cubies[11] = cubies[1];
-	cubies[1] = cubies[9];
-	cubies[9] = cubies[19];
-	cubies[19] = s;
+	cubies[11] = cubies[19];
+	cubies[19] = cubies[9];
+	cubies[9] = cubies[1];
+	cubies[1] = s;
 
 	r_string_down();
 }
@@ -228,16 +228,16 @@ void right()
 	cubies[18] = matrix_multiply(rotation, cubies[18]);
 
 	mat4 s = cubies[26];
-	cubies[26] = cubies[20];
-	cubies[20] = cubies[18];
-	cubies[18] = cubies[24];
-	cubies[24] = s;
+	cubies[26] = cubies[24];
+	cubies[24] = cubies[18];
+	cubies[18] = cubies[20];
+	cubies[20] = s;
 
 	s = cubies[25];
-	cubies[25] = cubies[23];
-	cubies[23] = cubies[19];
-	cubies[19] = cubies[21];
-	cubies[21] = s;
+	cubies[25] = cubies[21];
+	cubies[21] = cubies[19];
+	cubies[19] = cubies[23];
+	cubies[23] = s;
 
 	r_string_right();
 }
@@ -260,16 +260,16 @@ void left()
 	cubies[2] = matrix_multiply(rotation, cubies[2]);
 
 	mat4 s = cubies[6];
-	cubies[6] = cubies[0];
-	cubies[0] = cubies[2];
-	cubies[2] = cubies[8];
-	cubies[8] = s;
+	cubies[6] = cubies[8];
+	cubies[8] = cubies[2];
+	cubies[2] = cubies[0];
+	cubies[0] = s;
 
 	s = cubies[7];
-	cubies[7] = cubies[3];
-	cubies[3] = cubies[1];
-	cubies[1] = cubies[5];
-	cubies[5] = s;
+	cubies[7] = cubies[5];
+	cubies[5] = cubies[1];
+	cubies[1] = cubies[3];
+	cubies[3] = s;
 
 	r_string_left();
 }
