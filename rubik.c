@@ -100,20 +100,36 @@ void back()
 {
 	puts("Back");
 	rotation_matrix = identity();
-	
-
-	mat4 s = cubies[18];
-	cubies[18] = cubies[0];
-	cubies[0] = cubies[6];
-	cubies[6] = cubies[24];
-	cubies[24] = s;
-
-	s = cubies[3];
-	cubies[3] = cubies[15];
-	cubies[15] = cubies[21];
-	cubies[21] = cubies[9];
-	cubies[9] = s;
 	back_animation();
+
+	// change backs
+	int s = i_back[0];
+	i_back[0] = i_back[6];
+	i_back[6] = i_back[8];
+	i_back[8] = i_back[2];
+	i_back[2] = s;
+
+	s = i_back[1];
+	i_back[1] = i_back[3];
+	i_back[3] = i_back[7];
+	i_back[7] = i_back[5];
+	i_back[5] = s;
+
+	//change rights
+	i_right[2] = i_back[0];
+	i_right[5] = i_back[3];
+	i_right[8] = i_back[6];
+
+	//change lefts
+	i_left[0] = i_back[2];
+	i_left[3] = i_back[5];
+	i_left[6] = i_back[8];
+
+	//change up
+	i_up[0] = i_back[2];
+	i_up[1] = i_back[1];
+	i_up[2] = i_back[0];
+
 	r_string_back();
 	
 }
