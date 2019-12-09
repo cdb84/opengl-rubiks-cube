@@ -100,20 +100,20 @@ void back()
 {
 	puts("Back");
 	rotation_matrix = identity();
-	back_animation();
+	
 
 	mat4 s = cubies[18];
-	cubies[18] = cubies[24];
-	cubies[24] = cubies[6];
-	cubies[6] = cubies[0];
-	cubies[0] = s;
+	cubies[18] = cubies[0];
+	cubies[0] = cubies[6];
+	cubies[6] = cubies[24];
+	cubies[24] = s;
 
 	s = cubies[3];
-	cubies[3] = cubies[9];
-	cubies[9] = cubies[21];
-	cubies[21] = cubies[15];
-	cubies[15] = s;
-	
+	cubies[3] = cubies[15];
+	cubies[15] = cubies[21];
+	cubies[21] = cubies[9];
+	cubies[9] = s;
+	back_animation();
 	r_string_back();
 	
 }
@@ -143,20 +143,20 @@ void front()
 {
 	puts("Front");
 	rotation_matrix = identity();
-	front_animation();
+	
 
 	mat4 s = cubies[8];
-	cubies[8] = cubies[26];
-	cubies[26] = cubies[20];
-	cubies[20] = cubies[2];
-	cubies[2] = s;
+	cubies[8] = cubies[2];
+	cubies[2] = cubies[20];
+	cubies[20] = cubies[26];
+	cubies[26] = s;
 
 	s = cubies[17];
-	cubies[17] = cubies[23];
-	cubies[23] = cubies[11];
-	cubies[11] = cubies[5];
-	cubies[5] = s;
-
+	cubies[17] = cubies[5];
+	cubies[5] = cubies[11];
+	cubies[11] = cubies[23];
+	cubies[23] = s;
+	front_animation();
 	r_string_front();
 }
 
@@ -185,20 +185,20 @@ void up()
 {
 	puts("Up");
 	rotation_matrix = identity();
-	up_animation();
+	
 
 	mat4 s = cubies[6];
-	cubies[6] = cubies[24];
-	cubies[24] = cubies[26];
-	cubies[26] = cubies[8];
-	cubies[8] = s;
+	cubies[6] = cubies[8];
+	cubies[8] = cubies[26];
+	cubies[26] = cubies[24];
+	cubies[24] = s;
 
 	s = cubies[15];
-	cubies[15] = cubies[25];
-	cubies[25] = cubies[17];
-	cubies[17] = cubies[7];
-	cubies[7] = s;
-
+	cubies[15] = cubies[7];
+	cubies[7] = cubies[17];
+	cubies[17] = cubies[25];
+	cubies[25] = s;
+	up_animation();
 	r_string_up();
 }
 void down_animation()
@@ -228,20 +228,20 @@ void down()
 {
 	puts("Down");
 	rotation_matrix = identity();
-	down_animation();
+	
 
 	mat4 s = cubies[2];
-	cubies[2] = cubies[20];
-	cubies[20] = cubies[18];
-	cubies[18] = cubies[0];
-	cubies[0] = s;
+	cubies[2] = cubies[0];
+	cubies[0] = cubies[18];
+	cubies[18] = cubies[20];
+	cubies[20] = s;
 
 	s = cubies[11];
-	cubies[11] = cubies[19];
-	cubies[19] = cubies[9];
-	cubies[9] = cubies[1];
-	cubies[1] = s;
-
+	cubies[11] = cubies[1];
+	cubies[1] = cubies[9];
+	cubies[9] = cubies[19];
+	cubies[19] = s;
+	down_animation();
 	r_string_down();
 }
 void right_animation()
@@ -270,20 +270,20 @@ void right()
 {
 	puts("Right");
 	rotation_matrix = identity();
-	right_animation();
+	
 
 	mat4 s = cubies[26];
-	cubies[26] = cubies[24];
-	cubies[24] = cubies[18];
-	cubies[18] = cubies[20];
-	cubies[20] = s;
+	cubies[26] = cubies[20];
+	cubies[20] = cubies[18];
+	cubies[18] = cubies[24];
+	cubies[24] = s;
 
 	s = cubies[25];
-	cubies[25] = cubies[21];
-	cubies[21] = cubies[19];
-	cubies[19] = cubies[23];
-	cubies[23] = s;
-
+	cubies[25] = cubies[23];
+	cubies[23] = cubies[19];
+	cubies[19] = cubies[21];
+	cubies[21] = s;
+	right_animation();
 	r_string_right();
 }
 void left_animation()
@@ -312,20 +312,20 @@ void left()
 {
 	puts("Left");
 	rotation_matrix = identity();
-	left_animation();
+	
 
 	mat4 s = cubies[6];
-	cubies[6] = cubies[8];
-	cubies[8] = cubies[2];
-	cubies[2] = cubies[0];
-	cubies[0] = s;
+	cubies[6] = cubies[0];
+	cubies[0] = cubies[2];
+	cubies[2] = cubies[8];
+	cubies[8] = s;
 
 	s = cubies[7];
-	cubies[7] = cubies[5];
-	cubies[5] = cubies[1];
-	cubies[1] = cubies[3];
-	cubies[3] = s;
-
+	cubies[7] = cubies[3];
+	cubies[3] = cubies[1];
+	cubies[1] = cubies[5];
+	cubies[5] = s;
+	left_animation();
 	r_string_left();
 }
 
@@ -589,6 +589,11 @@ void keyboard(unsigned char key, int mousex, int mousey)
 	if (key == 's') shuffle();
 	if (key == 'S') solve();
 }
+void mouse()
+{
+
+}
+
 void idle(void)
 {
 	for(int i = 0; i < CUBIES; i++)
